@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Maze Runner</title>
+<style type="text/css">
+canvas {
+  margin: auto;
+  overflow: hidden;
+  border:1px solid #000;
+}
+</style>
+
+<script src="input.js"></script>
+
+</head>
+
+<body>
+<div style="text-align:center">
+<canvas width="800" height="600" id="scene"></canvas>
+<p>Framerate: <span id="fps"></span></p>
+</div>
+
+<script>
+var consts = {
+	gridSize:25,
+	moveDelay:100
+};
+
+var player = {
+	x:0,
+	y:0,
+	lastMove:0
+};
+
+bgimg = new Image;
+bgimg.src = 'resources/bg.jpg';
+
+
+d = new Date();
+lastframe = d.getTime();
+lastkframe = d.getTime();
+
+window.onload=function(){
+	genMaze(32,24);
+	c = document.getElementById('scene');
+	initializeInput(c);
+	cc = c.getContext('2d');
+	setInterval(update, 1000/60);
+	console.log('hello');
+}
+var maze = {
+}
+
+function genMaze(sizex, sizey) {
+	maze.sizex = sizex;
+	maze.sizey = sizey;
+	maze.map = new Array();
+	for (var x = 0; x < sizex; x++) {
+		maze.map[x] = new Array();
+		for (var y = 0; y < sizey; y++) {
+			//console.log(x,y);
+			maze.map[x][y] = 0;
+		}
+	}
+	recExplore(10,10);
+	
+}
+
+// maze: 0:unseen,1:wall,2:road
+function unseen(x,y) {
+	if (x < 0 || y < 0 || x >= maze.sizex || y >= maze.sizey) return false;
+	return maze.map[x][y] == 0;
+}
+
+function set(x,y,k) {
+	if (x < 0 || y < 0 || x >= maze.sizex || y >= maze.sizey) return false;
+	maze.map[x][y]=k;
+}
+
+function recExplore(x,y) {
+	maze.map[x][y] = 2;
+	pos = new Array()
+	if (unseen(x-2,y)) pos.push([x-2,y]);
+	if (unseen(x+2,y)) pos.push([x+2,y]);
+	if (unseen(x,y+2)) pos.push([x,y+2]);
+	if (unseen(x,y-2)) pos.push([x,y-2]);
+	while (pos.length > 0) {
+		var rnd = Math.floor(Math.random()*pos.length);
+		var newx = pos[rnd][0];
+		var newy = pos[rnd][1];
+		//console.log(pos,rnd,newx,newy);
+		if (newx != x) {
+			set(newx,y-1,1);
+			set(newx,y+1,1);
+			set((x+newx)/2,y,2);
+		} else {
+			set(x+1, newy,1);
+			set(x-1, newy,1);
+			set(x, (y+newy)/2,2);
+		}
+		recExplore(newx,newy);
+		pos = [];
+		if (unseen(x-2,y)) pos.push([x-2,y]);
+		if (unseen(x+2,y)) pos.push([x+2,y]);
+		if (unseen(x,y+2)) pos.push([x,y+2]);
+		if (unseen(x,y-2)) pos.push([x,y-2]);
+	}
+}
+
+function drawMaze(cc) {
+	for (var x = 0; x < maze.sizex; x++) {
+		for (var y = 0; y < maze.sizey; y++) {
+			if (maze.map[x][y] <= 1) {
+				cc.fillRect(x*consts.gridSize,y*consts.gridSize, consts.gridSize, consts.gridSize);
+			}
+		}
+	}
+}
+
+framecount=0;
+
+function update() {
+	d = new Date();
+	tnow = d.getTime();
+	tfr = tnow - lastframe;
+	lastframe = tnow;
+	
+	framecount++;
+	if (framecount > 30) {
+		fps = Math.floor(1000/((tnow-lastkframe)/30));
+		framecount = 0;
+		lastkframe = tnow;
+		document.getElementById("fps").innerHTML = fps;	
+	}
+	var nx = player.x;
+	var ny = player.y;
+	if (keypressed(39)) nx = player.x+1;
+	if (keypressed(37)) nx = player.x-1;
+	if (keypressed(38)) ny = player.y-1;
+	if (keypressed(40)) ny = player.y+1;
+	if (maze.map[nx][ny] == 2) {
+		player.x = nx;
+		player.y = ny;
+	}
+
+	if (player.x == 30 && player.y == 22) {
+		// win!
+		player.x = 0;
+		player.y = 0;
+		genMaze(32,24);		
+	}
+
+	cc.clearRect(0, 0, c.width, c.height);
+
+	cc.drawImage(bgimg,0,0);
+	cc.fillStyle="#ff0000";
+	cc.beginPath();
+	cc.arc(player.x*consts.gridSize + consts.gridSize/2, player.y*consts.gridSize+consts.gridSize/2,10,0,2*Math.PI);
+	cc.fill();
+	drawMaze(cc);
+	
+}
+
+</script>
+
+</body>
+</html>
+

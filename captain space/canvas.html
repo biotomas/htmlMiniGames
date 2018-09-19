@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Captain Space</title>
+<style type="text/css">
+canvas {
+  margin: auto;
+  overflow: hidden;
+  border:1px solid #000;
+}
+</style>
+
+<script src="levels.js"></script>
+<script src="input.js"></script>
+<script src="projectiles.js"></script>
+<script src="hero.js"></script>
+
+</head>
+
+<body>
+<div style="text-align:center">
+<canvas width="800" height="600" id="scene"></canvas>
+<p>Framerate: <span id="fps"></span></p>
+</div>
+
+<script>
+var consts = {
+	heroJumpVel:-0.6,
+	heroSpeedNormal:0.3,
+	heroSpeedSprint:1,
+	heroJumps:2,
+	heroJumpsInterval:500,
+	gravity:0.001,
+	shotSpeed:0.8,	
+	// hero should be narrower than grid and shorter than 2*grid
+	heroWidth:66,
+	heroHeight:92,
+	gridSize:70,
+}
+
+var snd = new Audio("resources/knifeSlice.ogg"); // buffers automatically when created
+var music = new Audio("resources/music.ogg");
+music.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+
+bgimg = new Image;
+bgimg.src = 'resources/bg.jpg';
+
+
+camx = 400;
+camy = 300;
+d = new Date();
+lastframe = d.getTime();
+lastkframe = d.getTime();
+
+window.onload=function(){
+	//music.play();
+	c = document.getElementById('scene');
+	initializeInput(c);
+	hero_initialize(c);
+	cc = c.getContext('2d');
+	setInterval(update, 1000/60);
+	console.log('hello');
+
+	loadMap();
+}
+
+framecount=0;
+
+function update() {
+	d = new Date();
+	tnow = d.getTime();
+	tfr = tnow - lastframe;
+	lastframe = tnow;
+	
+	framecount++;
+	if (framecount > 30) {
+		fps = Math.floor(1000/((tnow-lastkframe)/30));
+		framecount = 0;
+		lastkframe = tnow;
+		document.getElementById("fps").innerHTML = fps;	
+	}
+
+
+	cc.clearRect(0, 0, c.width, c.height);
+
+	hero_update(tfr);
+
+	projectile_update(tfr);
+
+	//skybox
+	cc.drawImage(bgimg,-hero.x/10,-hero.y/10);	
+	//cc.drawImage(bgimg,0,0, bgimg.width,bgimg.height, 0, 0, 1920,1080);	
+	level_draw(cc);
+	hero_draw(cc);
+	projectile_draw(cc);
+	//score
+	cc.fillStyle="white";
+	cc.font="30px Arial";
+	cc.fillText(hero.score, 50, 50);
+}
+
+</script>
+
+</body>
+</html>
+

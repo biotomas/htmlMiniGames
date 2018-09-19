@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>IdleSpace</title>
+
+<script>
+var gameState = {
+	things:0,
+  increment:0,
+  makers:0,
+  lastUpdate:0
+};
+
+function sett(where, what) {
+  document.getElementById(where).innerHTML = what;
+}
+
+function update() {
+  var now = new Date();
+  var lupd = new Date(gameState.lastUpdate);
+  gameState.lastUpdate = now;
+  var timePassed =  (now - lupd)/1000;
+
+	gameState.things += timePassed * gameState.makers;
+  sett("thing", Math.round(gameState.things));
+}
+
+setInterval(update, 1000);
+
+function makeMaker() {
+	gameState.makers++;
+}
+
+function make(what) {
+	gameState[what]++;
+}
+
+function makeThing() {
+	gameState.things++;
+  sett("thing", gameState.things);
+}
+
+function saveGame() {
+  var d = new Date();
+  d.setTime(d.getTime() + (1000*24*60*60*1000)); //expire after 1000 days
+  document.cookie="state="+JSON.stringify(gameState)+"; expires="+d.toUTCString();
+}
+
+setInterval(saveGame, 5000);
+
+function loadGame() {
+  var savedata=document.cookie.split(";")[0].split("=")[1];
+  if (savedata != null) {
+    gameState = JSON.parse(savedata);
+  }
+}
+
+loadGame();
+
+function clearSave() {
+  var d = new Date();
+  document.cookie="state="+JSON.stringify(gameState)+"; expires="+d.toUTCString();
+  //gameState={};
+}
+
+
+</script>
+
+    </head>
+    <body>
+				<a href="" onclick="clearSave()">clear save</a>
+        <h1>Hello</h1>
+        <p>
+            You have <span id="thing"></span> things.
+        </p>
+        <p>
+            TestOut: <span id="test"></span>.
+        </p>
+				<a href="#" style="text-decoration:none; border:2px solid black; padding:5px;" onclick="makeThing()">Make a Thing</a>
+				<a href="#" style="text-decoration:none; border:2px solid black; padding:5px;" onclick="makeMaker()">Make a Maker</a>
+				<a href="#" style="text-decoration:none; border:2px solid black; padding:5px;" onclick="make('things')">Make Test</a>
+    </body>
+</html>

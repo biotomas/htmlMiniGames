@@ -1,0 +1,62 @@
+Basic Mechanic:
+platformer laser shooter (aiming with mouse)
+with double jump, dash,
+shooting laser beams, blocked by walls, reflected by mirrors
+player can place mirrors at locations he can reach with laser
+- can place mirrors through mirrors
+enemy (turrets) try to shot down mirrors if they see them
+
+Story:
+hero has to reclaim his spaceship flying in space by destroying mosters, freeing crew, repairing and presurizing rooms
+
+Metagame:
+rogue like rpg
+
+Oxygen:
+======
+hero consumes oxygen when not in base/ship
+when out of oxygen he teleports to base/ship automatically
+can upgrade oxygen capacity
+can find oxygen in the map/levels
+can repair and then use oxygen generators in the map/levels
+
+Parts:
+======
+hero collects parts in the map/levels
+used for upgrades and repairs
+can be manufactured later at bases
+
+Energy:
+=======
+can be made from fuel or renevable sources (sun)
+used by bases, ships, oxygen generators, hero shields
+
+Teleporting:
+============
+cost energy
+has max range, but can be chained
+can teleport from anywhere
+can teleport only to teleport stations
+teleport stations can be found and repaired
+
+Levels:
+=======
+randomly generated
+collectible stuff: fuel, oxygen, parts
+contain bio enemies (drop fuel)
+contain mech enemies (drop parts)
+contain bosses
+contain destructible blocks
+
+Bases:
+======
+can produce oxygen, fuel, parts, energy
+upgradable
+cannot move
+
+
+Story:
+======
+starts with a crashed ship and learns it can be repaired with lots of parts.
+oxygen is running out, has to reach abandoned base.
+- the ship is gradually being repaired (first only flies, then generates oxygen, has teleport, ..., can leave planet)

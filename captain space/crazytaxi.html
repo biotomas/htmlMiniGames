@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Crazy Taxi	</title>
+<style type="text/css">
+canvas {
+  margin: auto;
+  overflow: hidden;
+  border:1px solid #000;
+}
+</style>
+
+<script src="input.js"></script>
+
+</head>
+
+<body>
+<div style="text-align:center">
+<canvas width="800" height="600" id="scene"></canvas>
+<p>Framerate: <span id="fps"></span></p>
+</div>
+
+<script>
+var consts = {
+	lanes:3,
+};
+
+var player = {
+	x:0,
+};
+
+bgimg = new Image;
+bgimg.src = 'resources/bg.jpg';
+
+
+d = new Date();
+lastframe = d.getTime();
+lastkframe = d.getTime();
+
+window.onload=function(){
+	c = document.getElementById('scene');
+	initializeInput(c);
+	cc = c.getContext('2d');
+	setInterval(update, 1000/60);
+	console.log('hello');
+}
+
+framecount=0;
+
+function drawRoad(cc, t) {
+	cc.beginPath();
+	cc.moveTo(100,600);
+	cc.lineTo(380,50);
+	cc.moveTo(700,600);
+	cc.lineTo(420,50);
+
+	cc.moveTo(400,t % 600);
+	cc.lineTo(400,t % 600 + 100);
+	cc.strokeStyle="red";
+	cc.lineWidth=4;
+	cc.stroke();	
+}
+
+function update() {
+	d = new Date();
+	tnow = d.getTime();
+	tfr = tnow - lastframe;
+	lastframe = tnow;
+	
+	framecount++;
+	if (framecount > 30) {
+		fps = Math.floor(1000/((tnow-lastkframe)/30));
+		framecount = 0;
+		lastkframe = tnow;
+		document.getElementById("fps").innerHTML = fps;	
+	}
+	var nx = player.x;
+	if (keypressed(39)) nx = player.x+1;
+	if (keypressed(37)) nx = player.x-1;
+	if (nx < 0) nx = 0;
+	if (nx >= consts.lanes) nx = consts.lanes - 1;
+	player.x = nx;
+	
+
+	cc.clearRect(0, 0, c.width, c.height);
+
+	cc.drawImage(bgimg,0,0);
+	cc.fillStyle="#ff0000";
+	cc.beginPath();
+	cc.arc(player.x*100+100, 500,10,0,2*Math.PI);
+	cc.fill();
+	drawRoad(cc,tnow);
+	
+}
+
+</script>
+
+</body>
+</html>
+
