@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bomberman</title>
+</head>
+<body>
+
+<textarea id="customLevel" rows=10 cols=20 oninput="updateLevel()">##########
+#    #   #
+#    #   #
+#    #   #
+#    $   #
+#  #$#   #
+#  $ $   #
+#$$$ #   #
+#@   #   #
+##########
+</textarea>
+
+</br>
+<canvas id="canvas" width="600" height="600"/>
+
+
+<script>
+var canvas = document.getElementById("canvas");
+var c = canvas.getContext("2d");
+c.fillStyle = 'blue';
+//c.fillRect(10, 10, 60, 80);
+
+const gridSize = 60;
+
+var grid = document.getElementById("customLevel").value.split("\n").map(function(x){return x.split("")});
+
+var moveHistory = new Array();
+
+// player position
+var px = 0;
+var py = 0;
+
+const items = {
+	WALL:"#",
+  PLAYER:"@",
+  BOX:"$",
+  GOAL:".",
+  FLOOR:" ",
+  BOMB3:"3",
+  BOMB2:"2",
+  BOMB1:"1",
+	FIRE:"*",
+};
+
+const keys = {
+	LEFT:37,
+	UP:38,
+	RIGHT:39,
+	DOWN:40,
+	RESTART:82,
+	UNDO:85,
+  SPACE:32
+}
+
+var fireImage = new Image;
+fireImage.src = 'res/fire.png';
+
+function drawBomb(val) {
+	c.fillStyle = 'black';
+	c.beginPath();
+	c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
+	c.fill();
+	c.lineWidth = 3;
+	c.font = "30px Arial";
+	c.fillStyle = 'red';
+  c.fillText(val,x*gridSize + gridSize/3, y*gridSize + 0.65*gridSize);
+	c.stroke();
+}
+
+function draw() {
+	c.clearRect(0, 0, canvas.width, canvas.height);
+	for (y = 0; y < grid.length; y++) {
+		ln = grid[y];
+		for (x = 0; x < ln.length; x++) {
+		  switch (grid[y][x]) {
+			case items.WALL:
+				c.fillStyle = 'black';
+				c.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
+				break;
+			case items.BOX:
+				c.fillStyle = 'brown';
+				c.fillRect(x*gridSize+5,y*gridSize+5,gridSize-10,gridSize-10);
+				break;
+			case items.BOXGOAL:
+				c.fillStyle = 'brown';
+				c.fillRect(x*gridSize+5,y*gridSize+5,gridSize-10,gridSize-10);
+				c.fillStyle = 'yellow';
+				c.beginPath();
+				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
+				c.lineWidth = 3;
+				c.stroke();
+				break;
+			case items.GOAL:
+				c.beginPath();
+				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
+				c.lineWidth = 3;
+				c.stroke();
+				break;
+			case items.FIRE:
+				c.drawImage(fireImage,x*gridSize, y*gridSize);
+				break;
+			case items.BOMB3:
+				drawBomb(3);
+				break;
+			case items.BOMB2:
+				drawBomb(2);
+				break;
+			case items.BOMB1:
+				drawBomb(1);
+				break;
+			case items.PLAYER:
+				c.fillStyle = 'yellow';
+				c.beginPath();
+				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
+				c.fill();
+				c.lineWidth = 3;
+				c.stroke();
+
+				px = x;
+				py = y;
+				break;
+			case items.PLAYERGOAL:
+				c.fillStyle = 'yellow';
+				c.beginPath();
+				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
+				c.fill();
+				c.lineWidth = 3;
+				c.stroke();
+				c.beginPath();
+				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
+				c.lineWidth = 3;
+				c.stroke();
+
+				px = x;
+				py = y;
+				break;
+			}
+		}
+	}
+}
+
+draw();
+
+function updateLevel() {
+  grid = document.getElementById("customLevel").value.split("\n").map(function(x){return x.split("")});
+	console.log(moveHistory);
+	moveHistory = [];
+	draw();	
+}
+
+document.onkeydown = function(evt) {
+	evt = evt || window.event;
+	// where the player wants to move
+	//console.log(evt.keyCode);
+  gx = px;
+	gy = py;
+	switch (evt.keyCode) {
+		case keys.LEFT: 
+			gx--;
+			break;
+		case keys.RIGHT: 
+			gx++;
+			break;
+		case keys.UP: 
+			gy--;
+			break;
+		case keys.DOWN: 
+			gy++;
+			break;
+    case keys.SPACE:
+			moveHistory.push(JSON.parse(JSON.stringify(grid)));
+			grid[gy][gx] = items.BOMB3;   
+			break;
+		case keys.RESTART:
+			updateLevel();
+			return;
+		case keys.UNDO:
+			var prevGrid = moveHistory.pop();
+			if (prevGrid != null)
+				grid = prevGrid;
+			draw();
+			return;
+	}
+  //if moved
+  if ((gx != px || gy != py) && (grid[gy][gx] == items.FLOOR)) {
+			moveHistory.push(JSON.parse(JSON.stringify(grid)));
+			grid[gy][gx] = items.PLAYER;
+      if (grid[py][px] == items.PLAYER) {
+				grid[py][px] = items.FLOOR;
+      }
+			//remove fires
+			for (y = 0; y < grid.length; y++) {
+				for (x = 0; x < grid[y].length; x++) {
+					if (grid[y][x] == items.FIRE) grid[y][x] = items.FLOOR;
+				}
+			}
+			//update bombs
+			for (y = 0; y < grid.length; y++) {
+				for (x = 0; x < grid[y].length; x++) {
+					if (grid[y][x] == items.BOMB1) {
+						grid[y][x] = items.FIRE;
+						if (grid[y+1][x] != items.WALL) grid[y+1][x] = items.FIRE;
+						if (grid[y-1][x] != items.WALL) grid[y-1][x] = items.FIRE;
+						if (grid[y][x+1] != items.WALL) grid[y][x+1] = items.FIRE;
+						if (grid[y][x-1] != items.WALL) grid[y][x-1] = items.FIRE;
+					}
+					if (grid[y][x] == items.BOMB2) grid[y][x] = items.BOMB1;
+					if (grid[y][x] == items.BOMB3) grid[y][x] = items.BOMB2;
+				}
+			}
+	}
+	draw();
+};
+
+</script>
+
+</body>
+</html>
