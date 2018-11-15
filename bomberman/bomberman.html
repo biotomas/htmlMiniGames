@@ -5,9 +5,10 @@
 </head>
 <body>
 
-<textarea id="customLevel" rows=10 cols=20 oninput="updateLevel()">##########
-#    #   #
-#    #   #
+
+<textarea id="customLevel" rows=10 cols=20 oninput="restartLevel()">##########
+#    #  E#
+#    # . #
 #    #   #
 #    $   #
 #  #$#   #
@@ -22,6 +23,36 @@
 
 
 <script>
+var levels = [`\
+###
+#.#
+# #
+# #
+# #
+# #
+#@#
+###
+`,`\
+###
+#.#
+#$#
+# #
+# #
+# #
+#@#
+###
+`,`\
+#####
+# E #
+#   #
+# . #
+#   #
+#   #
+# @ #
+#####
+`];
+
+var levelId = 0;
 var canvas = document.getElementById("canvas");
 var c = canvas.getContext("2d");
 c.fillStyle = 'blue';
@@ -36,17 +67,22 @@ var moveHistory = new Array();
 // player position
 var px = 0;
 var py = 0;
+// enemy position
+var ex = 0;
+var ey = 0;
+var dead = false;
 
 const items = {
 	WALL:"#",
   PLAYER:"@",
   BOX:"$",
-  GOAL:".",
+  COIN:".",
   FLOOR:" ",
   BOMB3:"3",
   BOMB2:"2",
   BOMB1:"1",
 	FIRE:"*",
+	ENEMY:"E",
 };
 
 const keys = {
@@ -61,6 +97,8 @@ const keys = {
 
 var fireImage = new Image;
 fireImage.src = 'res/fire.png';
+var coinImage = new Image;
+coinImage.src = 'res/coin.png';
 
 function drawBomb(val) {
 	c.fillStyle = 'black';
@@ -85,23 +123,11 @@ function draw() {
 				c.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
 				break;
 			case items.BOX:
-				c.fillStyle = 'brown';
+				c.fillStyle = 'green';
 				c.fillRect(x*gridSize+5,y*gridSize+5,gridSize-10,gridSize-10);
 				break;
-			case items.BOXGOAL:
-				c.fillStyle = 'brown';
-				c.fillRect(x*gridSize+5,y*gridSize+5,gridSize-10,gridSize-10);
-				c.fillStyle = 'yellow';
-				c.beginPath();
-				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
-				c.lineWidth = 3;
-				c.stroke();
-				break;
-			case items.GOAL:
-				c.beginPath();
-				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
-				c.lineWidth = 3;
-				c.stroke();
+			case items.COIN:
+				c.drawImage(coinImage,x*gridSize, y*gridSize);
 				break;
 			case items.FIRE:
 				c.drawImage(fireImage,x*gridSize, y*gridSize);
@@ -126,33 +152,37 @@ function draw() {
 				px = x;
 				py = y;
 				break;
-			case items.PLAYERGOAL:
-				c.fillStyle = 'yellow';
+			case items.ENEMY:
+				c.fillStyle = 'red';
 				c.beginPath();
 				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
 				c.fill();
 				c.lineWidth = 3;
 				c.stroke();
-				c.beginPath();
-				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/4, 0, 2 * Math.PI, false);
-				c.lineWidth = 3;
-				c.stroke();
 
-				px = x;
-				py = y;
+				ex = x;
+				ey = y;
 				break;
 			}
 		}
 	}
 }
+window.onload = function() {
+	nextLevel();
+}
 
-draw();
-
-function updateLevel() {
+function restartLevel() {
   grid = document.getElementById("customLevel").value.split("\n").map(function(x){return x.split("")});
-	console.log(moveHistory);
+	//console.log(moveHistory);
 	moveHistory = [];
+	dead = false;
 	draw();	
+}
+
+function nextLevel() {
+	document.getElementById("customLevel").value = levels[levelId];
+	levelId++;
+	restartLevel();
 }
 
 document.onkeydown = function(evt) {
@@ -161,25 +191,31 @@ document.onkeydown = function(evt) {
 	//console.log(evt.keyCode);
   gx = px;
 	gy = py;
+	gex = ex;
+	gey = ey;
 	switch (evt.keyCode) {
 		case keys.LEFT: 
 			gx--;
+			gex++;
 			break;
 		case keys.RIGHT: 
 			gx++;
+			gex--;
 			break;
 		case keys.UP: 
 			gy--;
+			gey++;
 			break;
 		case keys.DOWN: 
 			gy++;
+			gey--;
 			break;
     case keys.SPACE:
 			moveHistory.push(JSON.parse(JSON.stringify(grid)));
 			grid[gy][gx] = items.BOMB3;   
 			break;
 		case keys.RESTART:
-			updateLevel();
+			restartLevel();
 			return;
 		case keys.UNDO:
 			var prevGrid = moveHistory.pop();
@@ -188,13 +224,42 @@ document.onkeydown = function(evt) {
 			draw();
 			return;
 	}
-  //if moved
-  if ((gx != px || gy != py) && (grid[gy][gx] == items.FLOOR)) {
+	if (dead) {
+		alert("You Lost :(");
+		restartLevel();
+		return;
+	}
+	target = grid[gy][gx];
+  if ((gx != px || gy != py)) {
+			if (target == items.ENEMY) {
+				alert("You died :(");
+				restartLevel();
+				return;
+			}
+			if (target == items.COIN) {
+				alert("You WIN :)");
+				nextLevel();
+				return;
+			}
+			if (target != items.FLOOR) {
+				return;
+			}
 			moveHistory.push(JSON.parse(JSON.stringify(grid)));
+			//move player
 			grid[gy][gx] = items.PLAYER;
       if (grid[py][px] == items.PLAYER) {
 				grid[py][px] = items.FLOOR;
       }
+			//enemy logic
+			if (grid[ey][ex] == items.ENEMY) {
+				if (grid[gey][gex] == items.COIN) {
+					dead = true;
+				}
+				if (grid[gey][gex] == items.FLOOR || grid[gey][gex] == items.COIN) {
+					grid[gey][gex] = items.ENEMY;
+					grid[ey][ex] = items.FLOOR;
+				}
+			}
 			//remove fires
 			for (y = 0; y < grid.length; y++) {
 				for (x = 0; x < grid[y].length; x++) {
@@ -205,6 +270,10 @@ document.onkeydown = function(evt) {
 			for (y = 0; y < grid.length; y++) {
 				for (x = 0; x < grid[y].length; x++) {
 					if (grid[y][x] == items.BOMB1) {
+						if (grid[y][x] == items.PLAYER || grid[y+1][x] == items.PLAYER || grid[y-1][x] == items.PLAYER 
+								|| grid[y][x+1] == items.PLAYER || grid[y][x-1] == items.PLAYER) {
+							dead = true;
+						}
 						grid[y][x] = items.FIRE;
 						if (grid[y+1][x] != items.WALL) grid[y+1][x] = items.FIRE;
 						if (grid[y-1][x] != items.WALL) grid[y-1][x] = items.FIRE;
