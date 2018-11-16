@@ -96,19 +96,27 @@ const keys = {
 }
 
 var fireImage = new Image;
-fireImage.src = 'res/fire.png';
 var coinImage = new Image;
+var boxImage = new Image;
+var enemyImage = new Image;
+var bombImage = new Image;
+var heroImage = new Image;
+var rockImage = new Image;
+var floorImage = new Image;
+fireImage.src = 'res/fire.png';
 coinImage.src = 'res/coin.png';
+boxImage.src = 'res/box.png';
+enemyImage.src = 'res/enemy.png';
+bombImage.src = 'res/bomb.png';
+heroImage.src = 'res/hero.png';
+rockImage.src = 'res/rock.png';
+floorImage.src = 'res/floor.png';
 
 function drawBomb(val) {
-	c.fillStyle = 'black';
-	c.beginPath();
-	c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
-	c.fill();
-	c.lineWidth = 3;
-	c.font = "30px Arial";
-	c.fillStyle = 'red';
-  c.fillText(val,x*gridSize + gridSize/3, y*gridSize + 0.65*gridSize);
+	c.drawImage(bombImage,x*gridSize, y*gridSize);
+	c.font = "30px Arial,bold";
+	c.fillStyle = 'white';
+  c.fillText(val,x*gridSize+10, y*gridSize+50);
 	c.stroke();
 }
 
@@ -117,14 +125,13 @@ function draw() {
 	for (y = 0; y < grid.length; y++) {
 		ln = grid[y];
 		for (x = 0; x < ln.length; x++) {
+			c.drawImage(floorImage,x*gridSize, y*gridSize);
 		  switch (grid[y][x]) {
 			case items.WALL:
-				c.fillStyle = 'black';
-				c.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
+				c.drawImage(rockImage,x*gridSize, y*gridSize);
 				break;
 			case items.BOX:
-				c.fillStyle = 'green';
-				c.fillRect(x*gridSize+5,y*gridSize+5,gridSize-10,gridSize-10);
+				c.drawImage(boxImage,x*gridSize, y*gridSize);
 				break;
 			case items.COIN:
 				c.drawImage(coinImage,x*gridSize, y*gridSize);
@@ -142,24 +149,12 @@ function draw() {
 				drawBomb(1);
 				break;
 			case items.PLAYER:
-				c.fillStyle = 'yellow';
-				c.beginPath();
-				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
-				c.fill();
-				c.lineWidth = 3;
-				c.stroke();
-
+				c.drawImage(heroImage,x*gridSize, y*gridSize);
 				px = x;
 				py = y;
 				break;
 			case items.ENEMY:
-				c.fillStyle = 'red';
-				c.beginPath();
-				c.arc(x*gridSize + gridSize/2, y*gridSize + gridSize/2, gridSize/2.5, 0, 2 * Math.PI, false);
-				c.fill();
-				c.lineWidth = 3;
-				c.stroke();
-
+				c.drawImage(enemyImage,x*gridSize, y*gridSize);
 				ex = x;
 				ey = y;
 				break;
