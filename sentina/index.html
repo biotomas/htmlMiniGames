@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sentina</title>
+</head>
+<body>
+
+</br>
+<canvas id="canvas" width="640" height="480"/>
+
+
+<script>
+var canvas = document.getElementById("canvas");
+var c = canvas.getContext("2d");
+c.fillStyle = 'blue';
+var bgImg = new Image;
+var cursorImg = null;
+bgImg.src = 'exampleProject/room.png'
+var mx,my;
+var objects = [];
+var highl = null;
+
+function addObject(name, posx, posy, imgsrc, width, height) {
+    if (imgsrc) {
+        var img = new Image;
+        img.src = imgsrc;
+        img.onload = function() {
+            objects.push({name:name,posx:posx,posy:posy,width:img.width,height:img.height,img:img});
+        };
+    } else {
+        objects.push({name:name,posx:posx,posy:posy,width:width,height:height,img:null});
+    }
+}
+
+function draw() {
+    c.fillStyle = 'blue';
+    c.fillRect(0, 0, 640, 480);
+    c.drawImage(bgImg, 0,0,640,480);
+    objects.forEach(function(o) {
+        if (o.img) {
+            c.drawImage(o.img, o.posx, o.posy);
+        }
+    });
+    if (highl) {
+        c.beginPath();
+        c.lineWidth = "3";
+        c.strokeStyle = "red";
+        c.rect(highl.posx,highl.posy,highl.width,highl.height);
+        c.stroke();
+    }
+    if (cursorImg) {
+        c.drawImage(cursorImg, mx - cursorImg.width/2,my - cursorImg.height/2);
+    }
+}
+
+window.onload = function(evt) {
+    console.log("onload");
+    draw();
+};
+
+document.onmousemove = function(evt) {
+	evt = evt || window.event;
+	mx = evt.clientX - canvas.offsetLeft;
+	my = evt.clientY - canvas.offsetTop;
+	highl = null;
+    objects.forEach(function(o) {
+        if (o.posx <= mx && o.posx + o.width >= mx && o.posy <= my && o.posy + o.height >= my) {
+            highl = o;
+        }
+    });	
+    if (highl) console.log(highl.name);
+	draw();
+};
+
+document.onkeydown = function(evt) {
+	evt = evt || window.event;
+	console.log(evt.keyCode);
+	console.log(objects);
+};
+
+    addObject('chair', 60,300, 'exampleProject/chair.png');
+    addObject('chair2', 220,300, 'exampleProject/chair.png');
+    addObject('window', 250,200, null, 200,200);
+    cursorImg = new Image;
+    cursorImg.src = 'exampleProject/chair.png';
+
+</script>
+
+</body>
+</html>
