@@ -53,14 +53,16 @@ heroImage = new Image;
 heroImage.src = 'res/hero.png';
 skullImage = new Image;
 skullImage.src = 'res/skull.png';
-fireImage = new Image;
-fireImage.src = 'res/fire.png';
-coinImage = new Image;
-coinImage.src = 'res/coin.png';
+
+for (var i = 1; i <= 10; i++) {
+  items[i-1] = new Image;
+  items[i-1].src='res/items/i'+i+'.png';
+}
+
 enemyImage = new Image;
 enemyImage.src = 'res/enemy.png';
 rockImage = new Image;
-rockImage.src = 'res/rock.png';
+rockImage.src = 'res/tree.png';
 floorImage = new Image;
 floorImage.src = 'res/floor.png';
 
@@ -77,10 +79,10 @@ function draw() {
 			c.drawImage(floorImage,x*gridSize, y*gridSize);
 			switch (level.grid[y][x]) {
 			case items.WALL:
-				c.drawImage(rockImage,x*gridSize, y*gridSize);
+				c.drawImage(rockImage,x*gridSize, y*gridSize-10);
 				break;
 			case items.COIN:
-				c.drawImage(coinImage,x*gridSize, y*gridSize);
+				c.drawImage(items[(x+y)%10],x*gridSize, y*gridSize, gridSize, gridSize);
 				break;
 			case items.BOX:
 				c.drawImage(boxImage,x*gridSize, y*gridSize);
