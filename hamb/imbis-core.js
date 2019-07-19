@@ -18,6 +18,10 @@ const moves = {
   GO_UP:"up",GO_DOWN:"down",GO_LEFT:"left",GO_RIGHT:"right"
 };
 
+const dir = {
+  UP:"up",DOWN:"down",LEFT:"left",RIGHT:"right"
+};
+
 function die() {
 	console.log("Hero died");
   hero.dead = true;
@@ -97,9 +101,14 @@ class BaseGO {
 	constructor(x,y) {
 		this.x = x;
 		this.y = y;
+        this.direction = dir.DOWN;
 	}
 	
 	moveTo(x,y) {
+	    if (x > this.x) this.direction = dir.RIGHT;
+	    if (x < this.x) this.direction = dir.LEFT;
+	    if (y > this.y) this.direction = dir.DOWN;
+	    if (y < this.y) this.direction = dir.UP;
 		this.x = x;
 		this.y = y;
 	}
