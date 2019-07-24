@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="custom.js"> </script>
+<script type="text/javascript" src="verbs.js"> </script>
+<style>
+h1,h3,p,form {
+    text-align: center;
+}
+
+p {
+    font-size: 20px;
+}
+td {
+    border: 1px solid black;
+    padding: 10px;
+    width: 150px;
+}
+input.text {
+    width: 140px;
+}
+td.pronoun {
+    font-weight:bold;
+    width: 40px;
+    text-align: center;
+    background-color: #afa;
+}
+table {
+    border: 1px solid black;
+    margin-left:auto;
+    margin-right:auto;
+}
+body {
+    width:800px;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Hungaro Trainer</h1>
+
+<div>
+<form>
+<input type="radio" id="vocabulary" name="drone" value="vocabulary" onchange="changeMode('vocabulary');" />
+<label for="vocabulary">Vocabulary Training</label>
+</br>
+<input type="radio" id="conjugation" name="drone" value="conjugation" onchange="changeMode('conjugation');" checked/>
+<label for="conjugation">Conjugation Training</label>
+</form>
+</div>
+<script>
+function changeMode(mode) {
+	document.getElementById('vocabularyTab').style.display="none";
+	document.getElementById('conjugationTab').style.display="none";
+	if (mode == 'conjugation') {
+		document.getElementById('conjugationTab').style.display="block";
+	}
+	if (mode == 'vocabulary') {
+		document.getElementById('vocabularyTab').style.display="block";
+	}
+}
+</script>
+<p>Correct: <span id="correct">0</span> Wrong: <span id="wrong">0</span></p>
+
+<div id="conjugationTab">
+<p>Fill in the missing form (type "?" if you don't know)</p>
+<table>
+<tr><td class="pronoun">Én</td><td id="p1">
+<form id="verbform" action="" onsubmit="return submitVerb()">
+<input class="text" type="text" name="word">
+</form>
+</td><td class="pronoun">Mi</td><td id="p4">vagyunk</td></tr>
+<tr><td class="pronoun">Te</td><td id="p2">vagy</td><td class="pronoun">Ti</td><td id="p5">vagytok</td></tr>
+<tr><td class="pronoun">Ö/Ön</td><td id="p3">van</td><td class="pronoun">Ök</td><td id="p6">vannak</td></tr>
+</table>
+<p>
+Meaning: "<span id="meaning"></span>",
+Time: <span id="time"></span>
+</p>
+<p id="result"></p>
+</div>
+
+<script>
+var answer = "";
+var correct = 0;
+var wrong = 0;
+
+function changeVerb() {
+  set("result", "");
+}
+
+function submitVerb() {
+  var ans = document.forms["verbform"]["word"].value
+  if (ans.includes("?")) {
+    alert("Correct answer is: " + answer);
+    nextVerb();
+    return false;
+  }
+  if (ans == answer) {
+    set("result", ans + " was Correct ! :-)");
+    correct++;
+    nextVerb();
+  } else {
+    set("result", "That is not correct, try again.");
+    wrong++;
+  }
+  set("correct",correct);
+  set("wrong",wrong);
+  return false;
+}
+
+function nextVerb() {
+  var id = Math.floor(Math.random() * verbs.length);
+  current = verbs[id];
+  set("meaning", current.deutsch);
+  time = Math.floor(Math.random() * 3);
+  alanyi = true;
+  if (current.t1 != "") {
+     alanyi = Math.random() > 0.5;
+  }
+  pref="";
+  if (time == 1) pref = "p";
+  if (time == 2) pref = "f";
+  if (alanyi) pref = pref + "a"; else pref = pref + "t";
+  hide = 1 + Math.floor(Math.random() * 6);
+  answer = current[pref+hide];
+  for (var i = 1; i<=6; i++) {
+     if (i != hide) 
+        set("p"+i, current[pref+i]);
+     else
+        set("p"+i,'<form id="verbform" action="" onsubmit="return submitVerb()"><input id="verbinput" class="text" type="text" oninput="changeVerb();" name="word"></form>');
+  }
+  document.getElementById("verbinput").focus();
+  set("meaning", current.deutsch);
+  timestr = "Present"
+  if (time == 1) timestr = "Past";
+  if (time == 2) timestr = "Future";
+  timestr += alanyi ? " Alanyi" : " Tárgyas";
+  set("time",timestr);
+}
+
+</script>
+
+
+<div id="vocabularyTab" style="display:none;">
+<p>
+Translate <b><span id="mainp"></span></b>
+</p>
+<p>
+<form id="wordform" action="" onsubmit="return submitWord()">
+<input type="text" name="word">
+</form>
+</p>
+<p id="message"></p>
+<span id="lmessage"></span>
+</div>
+
+<script>
+var wordCurrent;
+var debugOn = false;
+
+function debug(msg) {
+  if (debugOn) {
+    alert(msg);
+  }
+}
+
+function checkAnswer(ans, cans) {
+  cans1 = cans.replace(/ß/gi,"ss").replace(/ö/gi,"oe").replace(/ü/gi,"ue").replace(/ä/gi,"ae");
+	return cans == ans || cans1 == ans;
+}
+
+function set(id, value) {
+	document.getElementById(id).innerHTML = value;
+}
+
+function append(id, value) {
+	document.getElementById(id).innerHTML = value + "</br>" + document.getElementById(id).innerHTML;
+}
+
+function nextWord() {
+  var id = Math.floor((Math.random() * words.length));
+  wordCurrent = words[id];
+  set("mainp", wordCurrent.hungarian);
+}
+
+function submitWord() {
+  var ans = document.forms["wordform"]["word"].value
+  if (checkAnswer(ans, wordCurrent.german)) {
+    append("lmessage", "Correct :) " + wordCurrent.hungarian + " is " + wordCurrent.german);
+		correct++;
+  } else {
+    append("lmessage", "Wrong   :( " + wordCurrent.hungarian + " is " + wordCurrent.german + " and not " + ans);
+		wrong++;
+  }
+  document.forms["wordform"]["word"].value = "";
+  set("correct",correct);
+  set("wrong",wrong);
+  nextWord();
+  return false;
+}
+
+nextWord();
+nextVerb();
+
+</script>
+</body>
+</html>
+
