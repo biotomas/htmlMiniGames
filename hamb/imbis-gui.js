@@ -1,5 +1,5 @@
 window.onload = function() {
-	initLevel();
+	initLevel(0);
   setInterval(mainLoop, 15);
 }
 
@@ -8,9 +8,15 @@ function mainLoop() {
   draw();
 }
 
+var currentLevel = 0;
+function nextLevel() {
+    currentLevel++;
+    initLevel(currentLevel);
+}
 
-function initLevel() {
-  loadLevel(levels[0]);
+function initLevel(lev) {
+  currentLevel = lev;
+  loadLevel(levels[lev]);
   level.precomputeShortestPaths();
   canvas.height = (level.heigth-1) * gridSize;
   canvas.width = level.width * gridSize;
@@ -93,10 +99,9 @@ for (var i = 1; i <= 10; i++) {
   items[i-1] = limg('res/items/i'+i+'.png');
 }
 
-enemyImage = new Image;
-enemyImage.src = 'res/enemy.png';
 rockImage = limg('res/tree.png');
 floorImage = limg('res/floor.png');
+imbissImage = limg('res/imbiss.png');
 
 var canvas = document.getElementById("canvas");
 var c = canvas.getContext("2d");
@@ -109,6 +114,11 @@ function draw() {
 		var ln = level.grid[y];
 		for (var x = 0; x < ln.length; x++) {
 			c.drawImage(floorImage,x*gridSize, y*gridSize);
+		}
+  }
+  for (var y = 0; y < level.grid.length; y++) {
+		var ln = level.grid[y];
+		for (var x = 0; x < ln.length; x++) {
 			switch (level.grid[y][x]) {
 			case items.WALL:
 				c.drawImage(rockImage,x*gridSize, y*gridSize-10);
@@ -119,6 +129,10 @@ function draw() {
 			case items.BOX:
 				c.drawImage(boxImage,x*gridSize, y*gridSize);
 				break;
+			case items.IMBISS:
+				c.drawImage(imbissImage,x*gridSize, y*gridSize, 4*gridSize, 2.5*gridSize);
+				break;
+			
 			}
 		}
 	}

@@ -11,7 +11,9 @@ const items = {
 		COIN:".",
 		FLOOR:" ",
 		ENEMY:"E",
-    UNDEF:"-",
+		IMBISS:"I",
+		IMBISSC:"C",
+        UNDEF:"-",
 };
 
 const moves = {
@@ -95,6 +97,8 @@ function update() {
 
   // enemy
   enemy.goto(gx,gy);
+  
+  hero.update();
 }
 
 class BaseGO {
@@ -121,17 +125,19 @@ class Hero extends BaseGO {
     this.dead = false;
     this.win = false;
 	}
-	
-  checkwin() {
-    return false;
-  }
-	
+		
 	update() {
-		if (enemy && this.x == enemy.x && this.y == enemy.y) {
+		var ix = Math.floor(this.x+0.5);
+        var iy = Math.floor(this.y+0.5);
+		var ex = Math.floor(enemy.x+0.5);
+        var ey = Math.floor(enemy.y+0.5);
+		if (ix == ex && iy == ey) {
 			die();
-			return true;
 		}
-		return false;
+        var here = level.grid[iy][ix];
+        if (here == items.IMBISS || here == items.IMBISSC) {
+            nextLevel();
+        } 
 	}
 }
 
