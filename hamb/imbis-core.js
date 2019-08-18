@@ -1,9 +1,11 @@
+const move_tolerance = 0.2;
+const move_speed = 0.1;
+const move_speed_enemy_initial = 0.005;
+const move_speed_enemy_increase = 0.005;
 
-
-var hero;
-var level;
-var enemy;
-
+const gameState = {
+  INTRO:"intro",DEAD:"dead",WON:"won",PLAY:"play"
+};
 
 const items = {
 		WALL:"#",
@@ -24,9 +26,20 @@ const dir = {
   UP:"up",DOWN:"down",LEFT:"left",RIGHT:"right"
 };
 
+var hero;
+var level;
+var enemy;
+var score = 0;
+var startTime = 0;
+var move_speed_enemy = 0;
+var endTime = 0;
+var state = gameState.INTRO;
+
+
 function die() {
-	console.log("Hero died");
-  hero.dead = true;
+  console.log("Hero died");
+  state = gameState.DEAD;
+  endTime = Date.now();
 }
 
 var maze;
@@ -43,14 +56,13 @@ function loadLevel(levstr) {
 	} else {
 		enemy = null;
 	}
+	move_speed_enemy = move_speed_enemy_initial;
 }
 
-const move_tolerance = 0.2;
-const move_speed = 0.1;
-// must be less than 0.1
-const move_speed_enemy = 0.05;
-
 function update() {
+  if (state != gameState.PLAY) {
+    return;
+  }
   var gx = hero.x;
   var gy = hero.y;
   if (isDown(keys.UP)) gy -= move_speed;
@@ -92,7 +104,8 @@ function update() {
   var cy = Math.floor(gy+0.5);
   if (level.grid[cy][cx] == items.COIN) {
     level.grid[cy][cx] = items.FLOOR;
-    console.log("coin collected");
+    score = score+1;
+    move_speed_enemy += move_speed_enemy_increase;
 	}	
 
   // enemy
@@ -122,8 +135,6 @@ class BaseGO {
 class Hero extends BaseGO {
 	constructor(x,y) {
 		super(x,y)
-    this.dead = false;
-    this.win = false;
 	}
 		
 	update() {
