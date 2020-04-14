@@ -1,0 +1,186 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Crazy Taxi	</title>
+    <style type="text/css">
+        canvas {
+            margin: auto;
+            overflow: hidden;
+            border: 1px solid #000;
+        }
+    </style>
+    <script src="input.js"></script>
+</head>
+<body>
+    <div style="text-align:center; width:100%; height:100%">
+        <canvas id="scene"></canvas>
+        <p>Framerate: <span id="fps"></span></p>
+    </div>
+    <script>
+        var consts = {
+            lanes: 3,
+            tileWidth: 80,
+            tileHeight: 60
+        };
+
+        var player = {
+            x: 0,
+        };
+
+
+
+        d = new Date();
+        lastframe = d.getTime();
+        lastkframe = d.getTime();
+        framecount = 0;
+
+        window.onload = function () {
+            c = document.getElementById('scene');
+            initializeInput(c);
+            c.width = window.innerWidth - 100;
+            c.height = window.innerHeight - 100;
+            cc = c.getContext('2d');
+            setInterval(update, 1000 / 60);
+            map = new Array(100);
+            for (i = 0; i < 100; i++) {
+                map[i] = new Array(100);
+            }
+        }
+
+        function drawBackground(cc, time) {
+            xoffset = (time / 100) % 100;
+            for (x = 0; x < c.width + bgimg.width; x += bgimg.width) {
+                for (y = 0; y < c.height + bgimg.height; y += bgimg.height) {
+                    cc.drawImage(bgimg, x - xoffset, y - xoffset);
+                }
+            }
+        }
+
+        bgimg = loadImage('assets/water.png');
+        farmImg = loadImage('assets/farm.png');
+        towerImg = loadImage('assets/tower.png');
+        townImg = loadImage('assets/town.png');
+        treeImg = loadImage('assets/tree.png');
+        peasantImg = loadImage('assets/peasant.png');
+        spearmanImg = loadImage('assets/spearman.png');
+        swordsmanImg = loadImage('assets/swordsman.png');
+        knightImg = loadImage('assets/knight.png');
+
+        sprites = [
+            farmImg, towerImg, townImg, treeImg, peasantImg, spearmanImg, swordsmanImg, knightImg
+        ];
+        currentSprite = 0;
+
+        function loadImage(src) {
+            img = new Image;
+            img.src = src;
+            return img;
+        }
+
+        globalxoff = 0;
+        globalyoff = 0;
+
+        function coordsToPixels(x, y) {
+            dy = 0;
+            if (x % 2 == 1) {
+                dy = consts.tileHeight / 2;
+            }
+            return [x * consts.tileWidth * 0.75 + globalxoff, dy + y * consts.tileHeight + globalyoff];
+        }
+
+        function pixelsToCoords(x, y) {
+            mx = Math.floor((x - globalxoff + consts.tileWidth / 2) / (consts.tileWidth * 0.75));
+            dy = 0;
+            if (mx % 2 == 1) {
+                dy = consts.tileHeight / 2;
+            }
+            my = Math.floor((y - globalyoff - dy + consts.tileHeight / 2) / consts.tileHeight);
+            return [mx, my];
+        }
+
+        function drawImage(cc, img, x, y) {
+            pos = coordsToPixels(x, y);
+            cc.drawImage(img, pos[0] - consts.tileWidth/2, pos[1] - consts.tileHeight);
+
+        }
+
+        function drawTile(cc, x, y, color) {
+            pos = coordsToPixels(x, y);
+            cc.beginPath();
+            cc.moveTo(pos[0] - consts.tileWidth / 2, pos[1]);
+            cc.lineTo(pos[0] - consts.tileWidth / 4, pos[1] - consts.tileHeight / 2);
+            cc.lineTo(pos[0] + consts.tileWidth / 4, pos[1] - consts.tileHeight / 2);
+            cc.lineTo(pos[0] + consts.tileWidth / 2, pos[1]);
+            cc.lineTo(pos[0] + consts.tileWidth / 4, pos[1] + consts.tileHeight / 2);
+            cc.lineTo(pos[0] - consts.tileWidth / 4, pos[1] + consts.tileHeight / 2);
+            cc.closePath();
+            cc.fillStyle = color;
+            cc.stroke();
+            cc.fill();
+        }
+
+
+        function update() {
+
+            d = new Date();
+            tnow = d.getTime();
+            tfr = tnow - lastframe;
+            lastframe = tnow;
+
+            framecount++;
+            if (framecount > 30) {
+                fps = Math.floor(1000 / ((tnow - lastkframe) / 30));
+                framecount = 0;
+                lastkframe = tnow;
+                document.getElementById("fps").innerHTML = fps;
+            }
+
+            if (keyState[69]) {
+                currentSprite = (currentSprite + 1) % sprites.length;
+
+            }
+            if (keyState[65]) {
+                globalxoff += 5;
+            }
+            if (keyState[68]) {
+                globalxoff -= 5;
+            }
+            if (keyState[87]) {
+                globalyoff += 5;
+            }
+            if (keyState[83]) {
+                globalyoff -= 5;
+            }
+            if (keyState['mouse']) {
+                map[mx][my] = sprites[currentSprite];
+            }
+
+            drawBackground(cc, tnow);
+
+            // draw hexagons
+            for (i = 1; i < 10; i++) {
+                for (j = 1; j < 10; j++) {
+                    drawTile(cc, i, j, '#aaddaa');
+                }
+            }
+
+            for (i = 1; i < 10; i++) {
+                for (j = 1; j < 10; j++) {
+                    if (map[i][j]) {
+                        drawImage(cc, map[i][j], i, j);
+                    }
+                }
+            }
+
+            mousePos = pixelsToCoords(mousex, mousey);
+            mx = mousePos[0];
+            my = mousePos[1];
+
+            drawImage(cc, sprites[currentSprite], mx, my);
+
+        }
+
+    </script>
+</body>
+</html>
