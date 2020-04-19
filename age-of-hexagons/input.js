@@ -21,13 +21,23 @@ function initializeInput(c) {
 	}, true);
 
     window.addEventListener('mousedown', function (e) {
-        console.log("mouse down");
-		keyState['mouse'] = true;
-	}, true);
+		if (e.button == 0) {
+			keyState['leftMouse'] = true;
+		}
+		if (e.button == 2) {
+			keyState['rightMouse'] = true;
+		}
+    }, true);
 
 	window.addEventListener('mouseup', function(e) {
-		keyState['mouse'] = false;
+		keyState['leftMouse'] = false;
+		keyState['rightMouse'] = false;
 	}, true);
+
+	window.addEventListener('contextmenu', function(e) {
+		e.preventDefault();
+		return false;
+	}, false);
 }
 
 function keypressed(k) {

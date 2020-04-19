@@ -1,2 +1,4 @@
 // JavaScript source code
-ss
+maps = {
+
+}
