@@ -29,6 +29,7 @@ peasantImg = loadImage('assets/peasant.png');
 spearmanImg = loadImage('assets/spearman.png');
 swordsmanImg = loadImage('assets/swordsman.png');
 knightImg = loadImage('assets/knight.png');
+disabledImg = loadImage('assets/disabled.png');
 
 // See gameLogic.units for ordering
 var unitImages = [treeImg, towerImg, townImg, farmImg, peasantImg, spearmanImg, swordsmanImg, knightImg];
@@ -50,7 +51,7 @@ function drawBackground(cc, time) {
 
 function coordsToPixels(x, y) {
     dy = 0;
-    if (x % 2 == 1) {
+    if ((x+2) % 2 == 1) {
         dy = graphicConstants.tileHeight / 2;
     }
     return [x * graphicConstants.tileWidth * 0.75 + globalxoff, dy + y * graphicConstants.tileHeight + globalyoff];

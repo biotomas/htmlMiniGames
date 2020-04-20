@@ -15,16 +15,23 @@
     <script src="level.js"></script>
     <script src="gameLogic.js"></script>
     <script src="graphics.js"></script>
+    <script src="maps.js"></script>
 </head>
 
 <body>
     <div style="text-align:center; width:100%; height:100%">
-        <div>Use 0-8 to select player tile, use Q,W,E, ... P to select units</div>
+        <div>
+            Width:<input id="mapWidth" type="text" value="15"></input>
+            Height:<input id="mapHeight" type="text" value="15"></input>
+            <input onclick="changeMapSize()" type="button" value="Update Map Size"></input>
+            Use 0-8 to select player tile, use Q,W,E, ... P to select units, X to print level (to console)
+        </div>
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
     </div>
     <script>
-        currentLevel = new Level();
+        //currentLevel = new Level(15,15);
+        currentLevel = Object.assign(new Level(1,1), maps[0]);
 
 
 
@@ -45,6 +52,14 @@
 
         currentPlayerTile = null;
         currentUnit = null;
+
+        function changeMapSize() {
+            new_width = document.getElementById("mapWidth").value;
+            new_heigth = document.getElementById("mapHeight").value;
+            currentLevel.resize(new_width, new_heigth);
+        }
+
+
 
         function update() {
 
@@ -88,20 +103,29 @@
             if (keyState[83]) {
                 globalyoff -= 5;
             }
+            if (keyState[88]) {
+                console.log(currentLevel.toJson());
+            }
 
             currentLevel.draw(cc, tnow);
+            currentLevel.drawBorder(cc);
 
 
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
-            
+
+            if (mx < 0 || my < 0 || mx >= currentLevel.level_width || my >= currentLevel.level_heigth) {
+                return;
+            }
+
             cc.globalAlpha = 0.5;
             if (currentPlayerTile != null) {
                 if (!keyState['rightMouse']) {
                     drawTile(cc, mx, my, currentPlayerTile);
                 }
                 if (keyState['leftMouse']) {
+
                     currentLevel.tileMap[mx][my] = currentPlayerTile;
                 }
                 if (keyState['rightMouse']) {
