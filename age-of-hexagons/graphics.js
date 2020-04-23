@@ -49,6 +49,21 @@ function drawBackground(cc, time) {
     }
 }
 
+function scrollCanvas() {
+    if (keyState[65]) {
+        globalxoff += 5;
+    }
+    if (keyState[68]) {
+        globalxoff -= 5;
+    }
+    if (keyState[87]) {
+        globalyoff += 5;
+    }
+    if (keyState[83]) {
+        globalyoff -= 5;
+    }
+}
+
 function coordsToPixels(x, y) {
     dy = 0;
     if ((x+2) % 2 == 1) {
@@ -85,4 +100,20 @@ function drawTile(cc, x, y, color) {
     cc.fillStyle = playerColors[color];
     cc.stroke();
     cc.fill();
+}
+
+function drawTileCursor(cc, x, y) {
+    pos = coordsToPixels(x, y);
+    cc.beginPath();
+    cc.moveTo(pos[0] - graphicConstants.tileWidth / 2, pos[1]);
+    cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] - graphicConstants.tileHeight / 2);
+    cc.lineTo(pos[0] + graphicConstants.tileWidth / 4, pos[1] - graphicConstants.tileHeight / 2);
+    cc.lineTo(pos[0] + graphicConstants.tileWidth / 2, pos[1]);
+    cc.lineTo(pos[0] + graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
+    cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
+    cc.closePath();
+    cc.lineWidth=3;
+    cc.stroke();
+    cc.lineWidth=1;
+
 }

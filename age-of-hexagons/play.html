@@ -1,0 +1,95 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Age of Hexagons</title>
+    <style type="text/css">
+        canvas {
+            margin: auto;
+            overflow: hidden;
+            border: 1px solid #000;
+        }
+    </style>
+    <script src="input.js"></script>
+    <script src="level.js"></script>
+    <script src="gameLogic.js"></script>
+    <script src="graphics.js"></script>
+    <script src="maps.js"></script>
+</head>
+
+<body>
+    <div style="text-align:center; width:100%; height:100%">
+        <canvas id="scene"></canvas>
+        <p>Framerate: <span id="fps"></span></p>
+    </div>
+    <script>
+        //currentLevel = new Level(15,15);
+        currentLevel = Object.assign(new Level(1,1), maps[0]);
+
+
+
+        d = new Date();
+        lastframe = d.getTime();
+        lastkframe = d.getTime();
+        framecount = 0;
+
+        window.onload = function () {
+            c = document.getElementById('scene');
+            initializeInput(c);
+            c.width = window.innerWidth - 100;
+            c.height = window.innerHeight - 100;
+            cc = c.getContext('2d');
+            setInterval(update, 1000 / 60);
+        }
+
+
+        currentPlayerTile = null;
+        currentUnit = null;
+
+        function changeMapSize() {
+            new_width = document.getElementById("mapWidth").value;
+            new_heigth = document.getElementById("mapHeight").value;
+            currentLevel.resize(new_width, new_heigth);
+        }
+
+
+
+        function update() {
+
+            d = new Date();
+            tnow = d.getTime();
+            tfr = tnow - lastframe;
+            lastframe = tnow;
+
+            framecount++;
+            if (framecount > 30) {
+                fps = Math.floor(1000 / ((tnow - lastkframe) / 30));
+                framecount = 0;
+                lastkframe = tnow;
+                document.getElementById("fps").innerHTML = fps;
+            }
+
+            scrollCanvas();
+            if (keyState[88]) {
+                console.log(currentLevel.toJson());
+            }
+
+            currentLevel.draw(cc, tnow);
+
+            mousePos = pixelsToCoords(mousex, mousey);
+            mx = mousePos[0];
+            my = mousePos[1];
+
+            if (mx < 0 || my < 0 || mx >= currentLevel.level_width || my >= currentLevel.level_heigth) {
+                return;
+            }
+
+            drawTileCursor(cc, mx, my);
+
+        }
+
+    </script>
+</body>
+
+</html>
