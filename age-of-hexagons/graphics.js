@@ -66,7 +66,7 @@ function scrollCanvas() {
 
 function coordsToPixels(x, y) {
     dy = 0;
-    if ((x+2) % 2 == 1) {
+    if ((x + 2) % 2 == 1) {
         dy = graphicConstants.tileHeight / 2;
     }
     return [x * graphicConstants.tileWidth * 0.75 + globalxoff, dy + y * graphicConstants.tileHeight + globalyoff];
@@ -89,21 +89,26 @@ function drawImage(cc, img, x, y) {
 
 function drawTile(cc, x, y, color) {
     pos = coordsToPixels(x, y);
-    cc.beginPath();
-    cc.moveTo(pos[0] - graphicConstants.tileWidth / 2, pos[1]);
-    cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] - graphicConstants.tileHeight / 2);
-    cc.lineTo(pos[0] + graphicConstants.tileWidth / 4, pos[1] - graphicConstants.tileHeight / 2);
-    cc.lineTo(pos[0] + graphicConstants.tileWidth / 2, pos[1]);
-    cc.lineTo(pos[0] + graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
-    cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
-    cc.closePath();
+    hexagonPath(cc, pos);
     cc.fillStyle = playerColors[color];
     cc.stroke();
     cc.fill();
 }
 
-function drawTileCursor(cc, x, y) {
+function drawTileCursor(cc, x, y, time) {
     pos = coordsToPixels(x, y);
+    hexagonPath(cc, pos);
+    cc.lineWidth = 3;
+    x = (time / 10) % 20;
+    cc.lineDashOffset = x;
+    cc.setLineDash([10, 10]);
+    cc.stroke();
+    cc.lineWidth = 1;
+    cc.setLineDash([]);
+
+}
+
+function hexagonPath(cc, pos) {
     cc.beginPath();
     cc.moveTo(pos[0] - graphicConstants.tileWidth / 2, pos[1]);
     cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] - graphicConstants.tileHeight / 2);
@@ -112,8 +117,4 @@ function drawTileCursor(cc, x, y) {
     cc.lineTo(pos[0] + graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
     cc.lineTo(pos[0] - graphicConstants.tileWidth / 4, pos[1] + graphicConstants.tileHeight / 2);
     cc.closePath();
-    cc.lineWidth=3;
-    cc.stroke();
-    cc.lineWidth=1;
-
 }
