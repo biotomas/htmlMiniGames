@@ -9,6 +9,11 @@ var units = {
     Knight:7
 }
 
+function canMoveTo(unit, level, mx, my) {
+    console.log(level.tileMap[mx][my]);
+    return unit > 3 && unit < 8 && level.tileMap[mx][my] != null;
+}
+
 var GamePlayConstants = {
     // per turn incomes
     farmIncome:5,

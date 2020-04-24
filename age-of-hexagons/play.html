@@ -53,6 +53,7 @@
             currentLevel.resize(new_width, new_heigth);
         }
 
+        selectedUnit = null;
 
 
         function update() {
@@ -74,8 +75,16 @@
             if (keyState[88]) {
                 console.log(currentLevel.toJson());
             }
+            
+            currentLevel.drawTiles(cc, tnow);
 
-            currentLevel.draw(cc, tnow);
+            if (selectedUnit != null) {    
+                cc.strokeStyle = "green";
+                drawTileCursor(cc, selectedUnit.mx, selectedUnit.my, tnow);
+                cc.strokeStyle = "black";
+            }
+
+            currentLevel.drawUnits(cc, tnow);
 
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
@@ -86,6 +95,16 @@
             }
 
             drawTileCursor(cc, mx, my, tnow);
+
+            if (keyState['leftMouse']) {
+                if (currentLevel.unitMap[mx][my]) {
+                    selectedUnit = {mx,my};
+                } else if (selectedUnit && canMoveTo(currentLevel.unitMap[selectedUnit.mx][selectedUnit.my], currentLevel, mx,my)) {
+                    currentLevel.unitMap[mx][my] = currentLevel.unitMap[selectedUnit.mx][selectedUnit.my];
+                    currentLevel.unitMap[selectedUnit.mx][selectedUnit.my] = null;
+                }
+            }
+
 
         }
 

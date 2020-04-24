@@ -1,7 +1,7 @@
 
 function resizeArray(arr, newSize, defaultValue) {
-    while(newSize > arr.length)
-    arr.push(defaultValue);
+    while (newSize > arr.length)
+        arr.push(defaultValue);
     arr.length = newSize;
 }
 
@@ -45,7 +45,7 @@ class Level {
 
     }
 
-    draw(context, timeNow) {
+    drawTiles(context, timeNow) {
         drawBackground(context, timeNow);
 
         // draw tiles
@@ -56,7 +56,9 @@ class Level {
                 }
             }
         }
+    }
 
+    drawUnits(context, timeNow) {
         // draw units
         for (var i = 0; i < this.level_width; i++) {
             for (var j = 0; j < this.level_heigth; j++) {
