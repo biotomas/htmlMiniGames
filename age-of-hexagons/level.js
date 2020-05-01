@@ -18,6 +18,10 @@ class Level {
         }
     };
 
+    outOfBounds(x,y) {
+        return x < 0 || y < 0 || x >= this.level_width || y >= this.level_heigth;
+    }
+
     resize(new_width, new_heigth) {
         resizeArray(this.tileMap, new_width, new Array(new_heigth));
         resizeArray(this.unitMap, new_width, new Array(new_heigth));
@@ -47,7 +51,7 @@ class Level {
 
     drawTiles(context, timeNow) {
         drawBackground(context, timeNow);
-
+        cc.lineWidth = "1";
         // draw tiles
         for (var i = 0; i < this.level_width; i++) {
             for (var j = 0; j < this.level_heigth; j++) {

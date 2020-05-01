@@ -23,9 +23,11 @@ function initializeInput(c) {
     window.addEventListener('mousedown', function (e) {
 		if (e.button == 0) {
 			keyState['leftMouse'] = true;
+			keyDown['leftMouse'] = true;
 		}
 		if (e.button == 2) {
 			keyState['rightMouse'] = true;
+			keyDown['rightMouse'] = true;
 		}
     }, true);
 

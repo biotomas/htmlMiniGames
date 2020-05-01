@@ -98,14 +98,11 @@ function drawTile(cc, x, y, color) {
 function drawTileCursor(cc, x, y, time) {
     pos = coordsToPixels(x, y);
     hexagonPath(cc, pos);
-    cc.lineWidth = 3;
-    x = (time / 10) % 20;
+    x = (time / 20) % 20;
     cc.lineDashOffset = x;
     cc.setLineDash([10, 10]);
     cc.stroke();
-    cc.lineWidth = 1;
     cc.setLineDash([]);
-
 }
 
 function hexagonPath(cc, pos) {

@@ -16,16 +16,18 @@
     <script src="gameLogic.js"></script>
     <script src="graphics.js"></script>
     <script src="maps.js"></script>
+    <script src="buildMenu.js"></script>
 </head>
 
 <body>
     <div style="text-align:center; width:100%; height:100%">
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
+        <p>Cursor: <span id="cursor"></span></p>
     </div>
     <script>
         //currentLevel = new Level(15,15);
-        currentLevel = Object.assign(new Level(1,1), maps[0]);
+        currentLevel = Object.assign(new Level(1, 1), maps[0]);
 
 
 
@@ -43,10 +45,6 @@
             setInterval(update, 1000 / 60);
         }
 
-
-        currentPlayerTile = null;
-        currentUnit = null;
-
         function changeMapSize() {
             new_width = document.getElementById("mapWidth").value;
             new_heigth = document.getElementById("mapHeight").value;
@@ -54,6 +52,9 @@
         }
 
         selectedUnit = null;
+        reachableTiles = new Set();
+        currentPlayer = 1;
+
 
 
         function update() {
@@ -75,35 +76,85 @@
             if (keyState[88]) {
                 console.log(currentLevel.toJson());
             }
-            
+
             currentLevel.drawTiles(cc, tnow);
 
-            if (selectedUnit != null) {    
+            if (selectedUnit != null) {
+                cc.lineWidth=3;
                 cc.strokeStyle = "green";
                 drawTileCursor(cc, selectedUnit.mx, selectedUnit.my, tnow);
+                cc.lineWidth=1;
                 cc.strokeStyle = "black";
             }
 
-            currentLevel.drawUnits(cc, tnow);
 
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
 
-            if (mx < 0 || my < 0 || mx >= currentLevel.level_width || my >= currentLevel.level_heigth) {
-                return;
+            if (keypressed('rightMouse')) {
+                selectedUnit = null;
+                buildUnitSelected = null;
             }
 
-            drawTileCursor(cc, mx, my, tnow);
-
-            if (keyState['leftMouse']) {
-                if (currentLevel.unitMap[mx][my]) {
-                    selectedUnit = {mx,my};
-                } else if (selectedUnit && canMoveTo(currentLevel.unitMap[selectedUnit.mx][selectedUnit.my], currentLevel, mx,my)) {
-                    currentLevel.unitMap[mx][my] = currentLevel.unitMap[selectedUnit.mx][selectedUnit.my];
-                    currentLevel.unitMap[selectedUnit.mx][selectedUnit.my] = null;
+            if (!currentLevel.outOfBounds(mx, my)) {
+                cc.lineWidth=3;
+                drawTileCursor(cc, mx, my, tnow);
+                cc.lineWidth=1;
+                document.getElementById("cursor").innerHTML = mx + "," + my;
+                if (keypressed('leftMouse')) {
+                    if (currentLevel.unitMap[mx][my] == Units.Town) {
+                        // turn on/off build menu
+                        selectedUnit = { mx, my };
+                        reachableTiles = null;
+                        buildMenuEnabled = !buildMenuEnabled;
+                    } else if (buildUnitSelected) {
+                        console.log('sdf');
+                        if (canBuildHere(currentLevel, mx, my, currentPlayer)) {
+                            // build unit
+                            console.log('safsfd');
+                            currentLevel.unitMap[mx][my] = buildUnitSelected;
+                        }
+                        selectedUnit = null;
+                    } else if (currentLevel.unitMap[mx][my]) {
+                        // select/unselect unit
+                        if (selectedUnit && selectedUnit.mx == mx && selectedUnit.my == my) {
+                            selectedUnit = null;
+                            reachableTiles = null;
+                        } else {
+                            selectedUnit = { mx, my };
+                            reachableTiles = getReachableTiles(currentLevel, mx, my);
+                            currentPlayer = currentLevel.tileMap[mx][my];
+                        }
+                    } else if (selectedUnit && contains(reachableTiles, mx, my)) {
+                        // move selected unit
+                        currentLevel.unitMap[mx][my] = currentLevel.unitMap[selectedUnit.mx][selectedUnit.my];
+                        currentLevel.unitMap[selectedUnit.mx][selectedUnit.my] = null;
+                        currentLevel.tileMap[mx][my] = currentLevel.tileMap[selectedUnit.mx][selectedUnit.my];
+                        selectedUnit = { mx, my };
+                        reachableTiles = getReachableTiles(currentLevel, mx, my);
+                        currentPlayer = currentLevel.tileMap[mx][my];
+                    }
                 }
+
             }
+            if (selectedUnit && reachableTiles) {
+                cc.strokeStyle = "green";
+                cc.lineWidth = 3;
+                for (let value of reachableTiles) {
+                    drawTileCursor(cc, value.x, value.y, tnow);
+                }
+                cc.lineWidth = 1;
+                cc.strokeStyle = "black";
+            }
+            if (buildUnitSelected) {
+                cc.globalAlpha = 0.3;
+                drawImage(cc, unitImages[buildUnitSelected], mx, my);
+                cc.globalAlpha = 1;
+            }
+            updateBuildMenu();
+            currentLevel.drawUnits(cc, tnow);
+            drawBuildMenu(cc);
 
 
         }
