@@ -18,7 +18,7 @@ class Level {
         }
     };
 
-    outOfBounds(x,y) {
+    outOfBounds(x, y) {
         return x < 0 || y < 0 || x >= this.level_width || y >= this.level_heigth;
     }
 
@@ -45,8 +45,6 @@ class Level {
                 }
             }
         }
-
-
     }
 
     drawTiles(context, timeNow) {
@@ -71,8 +69,5 @@ class Level {
                 }
             }
         }
-
-
-
     }
 }

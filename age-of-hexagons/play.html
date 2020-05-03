@@ -17,6 +17,7 @@
     <script src="graphics.js"></script>
     <script src="maps.js"></script>
     <script src="buildMenu.js"></script>
+    <script src="gameMaster.js"></script>
 </head>
 
 <body>
@@ -42,7 +43,7 @@
             c.width = window.innerWidth - 100;
             c.height = window.innerHeight - 100;
             cc = c.getContext('2d');
-            setInterval(update, 1000 / 60);
+            setInterval(update, 1000 / 10);
         }
 
         function changeMapSize() {
@@ -55,6 +56,8 @@
         reachableTiles = new Set();
         currentPlayer = 1;
 
+        gameMaster = new GameMaster(currentLevel,2);
+        console.log(JSON.stringify(gameMaster));
 
 
         function update() {
@@ -123,7 +126,9 @@
                             reachableTiles = null;
                         } else {
                             selectedUnit = { mx, my };
-                            reachableTiles = getReachableTiles(currentLevel, mx, my);
+                            reachableTiles = getReachableTiles(gameMaster, currentPlayer,
+                            currentLevel.unitMap[mx][my], mx, my);
+                            console.log(reachableTiles);
                             currentPlayer = currentLevel.tileMap[mx][my];
                         }
                     } else if (selectedUnit && contains(reachableTiles, mx, my)) {
