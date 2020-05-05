@@ -18,6 +18,7 @@
     <script src="maps.js"></script>
     <script src="buildMenu.js"></script>
     <script src="gameMaster.js"></script>
+    <script src="hud.js"></script>
 </head>
 
 <body>
@@ -28,8 +29,6 @@
     </div>
     <script>
         //currentLevel = new Level(15,15);
-        currentLevel = Object.assign(new Level(1, 1), maps[0]);
-
 
 
         d = new Date();
@@ -52,58 +51,52 @@
             currentLevel.resize(new_width, new_heigth);
         }
 
+        States = {
+            IDLE: 0,
+            MOVE: 1,
+            BUILD: 2,
+            MENU: 3,
+        }
+
+
+        currentLevel = Object.assign(new Level(1, 1), maps[0]);
+        playerNames = ["nature", "Marc", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
         selectedUnit = null;
         reachableTiles = new Set();
-        currentPlayer = 1;
-
-        gameMaster = new GameMaster(currentLevel,2);
-        console.log(JSON.stringify(gameMaster));
+        state = States.IDLE;
+        gameMaster = new GameMaster(currentLevel, 2);
 
 
         function update() {
-
-            d = new Date();
             tnow = d.getTime();
-            tfr = tnow - lastframe;
-            lastframe = tnow;
-
-            framecount++;
-            if (framecount > 30) {
-                fps = Math.floor(1000 / ((tnow - lastkframe) / 30));
-                framecount = 0;
-                lastkframe = tnow;
-                document.getElementById("fps").innerHTML = fps;
-            }
-
             scrollCanvas();
-            if (keyState[88]) {
-                console.log(currentLevel.toJson());
-            }
-
             currentLevel.drawTiles(cc, tnow);
-
-            if (selectedUnit != null) {
-                cc.lineWidth=3;
-                cc.strokeStyle = "green";
-                drawTileCursor(cc, selectedUnit.mx, selectedUnit.my, tnow);
-                cc.lineWidth=1;
-                cc.strokeStyle = "black";
-            }
-
 
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
 
-            if (keypressed('rightMouse')) {
-                selectedUnit = null;
-                buildUnitSelected = null;
+            if (state == States.MOVE) {
+                cc.lineWidth = 3;
+                cc.strokeStyle = "green";
+                //drawTileCursor(cc, selectedUnit.mx, selectedUnit.my, tnow);
+                for (let value of reachableTiles) {
+                    drawTileCursor(cc, value.x, value.y, tnow);
+                }
+                cc.lineWidth = 1;
+                cc.strokeStyle = "black";
             }
 
             if (!currentLevel.outOfBounds(mx, my)) {
-                cc.lineWidth=3;
+                if (keypressed('rightMouse')) {
+
+                }
+            }
+
+            if (!currentLevel.outOfBounds(mx, my)) {
+                cc.lineWidth = 3;
                 drawTileCursor(cc, mx, my, tnow);
-                cc.lineWidth=1;
+                cc.lineWidth = 1;
                 document.getElementById("cursor").innerHTML = mx + "," + my;
                 if (keypressed('leftMouse')) {
                     if (currentLevel.unitMap[mx][my] == Units.Town) {
@@ -127,7 +120,7 @@
                         } else {
                             selectedUnit = { mx, my };
                             reachableTiles = getReachableTiles(gameMaster, currentPlayer,
-                            currentLevel.unitMap[mx][my], mx, my);
+                                currentLevel.unitMap[mx][my], mx, my);
                             console.log(reachableTiles);
                             currentPlayer = currentLevel.tileMap[mx][my];
                         }
@@ -143,27 +136,32 @@
                 }
 
             }
-            if (selectedUnit && reachableTiles) {
-                cc.strokeStyle = "green";
-                cc.lineWidth = 3;
-                for (let value of reachableTiles) {
-                    drawTileCursor(cc, value.x, value.y, tnow);
-                }
-                cc.lineWidth = 1;
-                cc.strokeStyle = "black";
-            }
             if (buildUnitSelected) {
                 cc.globalAlpha = 0.3;
                 drawImage(cc, unitImages[buildUnitSelected], mx, my);
                 cc.globalAlpha = 1;
             }
-            updateBuildMenu();
             currentLevel.drawUnits(cc, tnow);
+            updateBuildMenu();
             drawBuildMenu(cc);
-
-
+            drawHud(cc);
+            framerate();
         }
 
+        function framerate() {
+            d = new Date();
+            tnow = d.getTime();
+            tfr = tnow - lastframe;
+            lastframe = tnow;
+
+            framecount++;
+            if (framecount > 30) {
+                fps = Math.floor(1000 / ((tnow - lastkframe) / 30));
+                framecount = 0;
+                lastkframe = tnow;
+                document.getElementById("fps").innerHTML = fps;
+            }
+        }
     </script>
 </body>
 

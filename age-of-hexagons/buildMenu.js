@@ -1,25 +1,25 @@
-hudWidth = 540;
-hudHeigth = 130;
-hudx = 0;
-hudy = 0;
-hudActive = false;
+menuWidth = 540;
+menuHeigth = 130;
+menux = 0;
+menuy = 0;
+menuActive = false;
 buildUnit = 0;
 buildUnitSelected = 0;
 buildMenuEnabled = false;
 
 function updateBuildMenu() {
     if (!buildMenuEnabled) {
-        hudActive = false;
+        menuActive = false;
         buildUnit = 0;
         buildUnitSelected = 0;
         return;
     }
-    hudx = (c.width - hudWidth) / 2;
-    hudy = c.height - hudHeigth -10;
+    menux = (c.width - menuWidth) / 2;
+    menuy = c.height - menuHeigth -10;
 
-    if (mousex > hudx && mousex < hudx + hudWidth && mousey > hudy && mousey < hudy + hudHeigth) {
-        hudActive = true;
-        lx = mousex - hudx;
+    if (mousex > menux && mousex < menux + menuWidth && mousey > menuy && mousey < menuy + menuHeigth) {
+        menuActive = true;
+        lx = mousex - menux;
         if (lx < 240) {
             buildUnit = 1 + Math.floor((lx)/80);
         } else if (lx > 280) {
@@ -32,7 +32,7 @@ function updateBuildMenu() {
         }
     } else {
         buildUnit = 0;
-        hudActive = false;
+        menuActive = false;
     }
 }
 
@@ -41,27 +41,27 @@ function drawBuildMenu(cc) {
         return;
     }
     cc.beginPath();
-    if (hudActive) {
+    if (menuActive) {
         cc.lineWidth = "5";
     } else {
         cc.lineWidth = "1";
     }
     cc.strokeStyle = "black";
     cc.fillStyle = "gray";
-    cc.rect(hudx, hudy, hudWidth, hudHeigth);
+    cc.rect(menux, menuy, menuWidth, menuHeigth);
     cc.stroke();
     cc.fill();
     for (var unit = 1; unit <= 3; unit++) {
         
-        cc.drawImage(unitImages[unit], hudx + (unit-1)*80, hudy + 30 + (unit == buildUnit ? -8 : 0));
+        cc.drawImage(unitImages[unit], menux + (unit-1)*80, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     for (var unit = 4; unit <= 7; unit++) {
-        cc.drawImage(unitImages[unit], hudx + 280 + (unit-4)*60, hudy + 30 + (unit == buildUnit ? -8 : 0));
+        cc.drawImage(unitImages[unit], menux + 280 + (unit-4)*60, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     
     cc.fillStyle = "black";
     cc.font = "20px Arial";
-    cc.fillText("Build ", hudx+110, hudy+20);
-    cc.fillText("Train ", hudx+390, hudy+20);
+    cc.fillText("Build ", menux+110, menuy+20);
+    cc.fillText("Train ", menux+390, menuy+20);
     cc.font = "16px Arial";
 }
