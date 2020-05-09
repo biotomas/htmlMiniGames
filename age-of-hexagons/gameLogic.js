@@ -16,11 +16,13 @@ var GamePlayConstants = {
     range: [0, 0, 0, 0, 3, 2, 1, 3],
     incomes: [0, 0, 11, 6, -5, -10, -20, -30],
     cost: [0, 10, 30, 10, 10, 20, 30, 40],
-    tileIncone: 1,
+    tileIncome: 1,
     conquerTileBonus: 3,
     cutTreeBonus: 3,
     movesPerTurn: 3,
     startMoney:10,
+    treeSpawnProbability: 0.01,
+    treeReproduceProbability: 0.2,
 }
 
 var hexagonNeighbourhoodEven = new Set([
@@ -45,6 +47,10 @@ function canBuildHere(level, mx, my, currentPlayer) {
     return (level.tileMap[mx][my] == currentPlayer) && level.unitMap[mx][my] == null;
 }
 
+function canMove(unit) {
+    return unit > 3 && unit < 8;
+}
+
 function getNeighbouringHexas(x, y) {
     result = new Array();
     list = x % 2 == 0 ? hexagonNeighbourhoodEven : hexagonNeighbourhoodOdd;
@@ -54,7 +60,9 @@ function getNeighbouringHexas(x, y) {
     return result;
 }
 
-function getReachableTiles(gameMaster, player, unit, x, y) {
+function getReachableTiles(gameMaster, x, y) {
+    var player = gameMaster.currentPlayer;
+    var unit = gameMaster.level.unitMap[x][y];
     var reachable = new Set();
     for (let node of getReachableNodes(gameMaster.level, x, y, GamePlayConstants.range[unit])) {
         if (gameMaster.canEnterWithUnit(player, unit, node.x, node.y)) {
@@ -111,10 +119,11 @@ class PlayerState {
 
     endTurn() {
         this.money += this.getIncome();
+        this.moves = GamePlayConstants.movesPerTurn;
     }
 
     getIncome() {
-        var total = 0;
+        var total = this.tiles * GamePlayConstants.tileIncome;
         for (var i = 1; i < 8; i++) {
             total += this.unitCount[i] * GamePlayConstants.incomes[i];
         }

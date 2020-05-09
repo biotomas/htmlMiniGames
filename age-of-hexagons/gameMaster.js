@@ -36,7 +36,7 @@ class GameMaster {
 
     canMoveUnit(player, fromx, fromy, tox, toy) {
         var state = this.playerStates[player];
-        var unit = this.level.unitMap[x][y];
+        var unit = this.level.unitMap[fromx][fromy];
         return state.moves > 0
             && this.currentPlayer == player
             && this.level.tileMap[fromx][fromy] == player
@@ -56,7 +56,7 @@ class GameMaster {
                 }
             }
         }
-        console.log("defense x,y,val: ", x,y, maxDefense);
+        console.log("defense x,y,val: ", x, y, maxDefense);
         return maxDefense;
     }
 
@@ -79,6 +79,7 @@ class GameMaster {
         // cutting a tree
         if (goalUnit == Units.Tree) {
             state.money += GamePlayConstants.cutTreeBonus;
+            state.tiles++;
         }
         // entering foreign territory
         if (goalPlayer != player) {
@@ -95,9 +96,17 @@ class GameMaster {
         this.level.unitMap[tox][toy] = this.level.unitMap[fromx][fromy];
         this.level.unitMap[fromx][fromy] = null;
         state.moves--;
+        if (state.moves == 0) {
+            this.endTurn(this.currentPlayer);
+        }
     }
 
-    canBildUnit(player, x, y, unit) {
+    canAfford(unit) {
+        var money = this.playerStates[this.currentPlayer].money;
+        return money >= GamePlayConstants.cost[unit];
+    }
+
+    canBuildUnit(player, x, y, unit) {
         var state = this.playerStates[player];
         return state.moves > 0
             && this.level.tileMap[x][y] == player
@@ -106,13 +115,16 @@ class GameMaster {
     }
 
     buildUnit(player, x, y, unit) {
-        if (this.canBildUnit(player, x, y, unit)) {
+        if (this.canBuildUnit(player, x, y, unit)) {
             this.level.unitMap[x][y] = unit;
             var state = this.playerStates[player];
             state.unitCount[unit]++;
             state.moves--;
             state.tiles--;
             state.money -= GamePlayConstants.cost[unit];
+            if (state.moves == 0) {
+                this.endTurn(this.currentPlayer);
+            }
         } else {
             console.error("Invalid build");
         }
@@ -122,7 +134,10 @@ class GameMaster {
         if (this.currentPlayer != player) {
             console.error("Invalid end of turn");
         }
-        this.playerStates[player].moves = GamePlayConstants.movesPerTurn;
+        this.playerStates[player].endTurn();
+        if (this.playerStates[player].money <= 0) {
+            this.killAllUnits(player);
+        }
         this.currentPlayer = this.currentPlayer + 1;
         if (this.currentPlayer > this.players) {
             //end of global turn
@@ -132,8 +147,58 @@ class GameMaster {
         return this.currentPlayer;
     }
 
+    killAllUnits(player) {
+        var tiles = this.level.tileMap;
+        var units = this.level.unitMap;
+        for (var x = 0; x < this.level.level_width; x++) {
+            for (var y = 0; y < this.level.level_heigth; y++) {
+                if (tiles[x][y] == player && canMove(units[x][y])) {
+                    units[x][y] = null;
+                    this.playerStates[player].tiles++;
+                }
+            }
+        }
+        this.playerStates[player].unitCount[Units.Peasant] = 0;
+        this.playerStates[player].unitCount[Units.Swordsman] = 0;
+        this.playerStates[player].unitCount[Units.Spearman] = 0;
+        this.playerStates[player].unitCount[Units.Knight] = 0;
+        this.playerStates[player].money = 10;
+    }
+
     growTrees() {
-        //TODO
-        console.log("Trees will grow");
+        var tiles = this.level.tileMap;
+        var units = this.level.unitMap;
+        for (var x = 0; x < this.level.level_width; x++) {
+            for (var y = 0; y < this.level.level_heigth; y++) {
+                if (tiles[x][y] == null) {
+                    continue;
+                }
+                var rnd = Math.random();
+                // possibly spawn a tree from a tree
+                if (units[x][y] == Units.Tree && rnd < GamePlayConstants.treeReproduceProbability) {
+                    for (let neigh of getNeighbouringHexas(x, y)) {
+                        if (!this.level.outOfBounds(neigh.x, neigh.y)
+                            && tiles[neigh.x][neigh.y] != null
+                            && units[neigh.x][neigh.y] == null) {
+                            this.addTree(neigh.x, neigh.y);
+                            break;
+                        }
+                    }
+                }
+                // possibly spawn a tree from nothing
+                if (units[x][y] == null && rnd < GamePlayConstants.treeSpawnProbability) {
+                    this.addTree(x, y);
+                }
+            }
+        }
+    }
+
+    addTree(x, y) {
+        var tiles = this.level.tileMap;
+        var units = this.level.unitMap;
+        units[x][y] = Units.Tree;
+        if (tiles[x][y] > 0) {
+            this.playerStates[tiles[x][y]].tiles--;
+        }
     }
 }

@@ -27,12 +27,19 @@ function updateBuildMenu() {
         } else {
             buildUnit = 0;
         }
-        if (keyState['leftMouse']) {
-            buildUnitSelected = buildUnit;
+        if (keypressed('leftMouse') && gameMaster.canAfford(buildUnit)) {
+            state = States.BUILD;
+            unitToBuild = buildUnit;
+            buildMenuEnabled = false;
         }
     } else {
         buildUnit = 0;
         menuActive = false;
+        if (keypressed('leftMouse')) {
+            state = States.IDLE;
+            unitToBuild = buildUnit;
+            buildMenuEnabled = false;
+        }
     }
 }
 
@@ -52,13 +59,22 @@ function drawBuildMenu(cc) {
     cc.stroke();
     cc.fill();
     for (var unit = 1; unit <= 3; unit++) {
-        
+        if (gameMaster.canAfford(unit)) {
+            cc.globalAlpha = 1;
+        } else {
+            cc.globalAlpha = 0.2;
+        }
         cc.drawImage(unitImages[unit], menux + (unit-1)*80, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     for (var unit = 4; unit <= 7; unit++) {
+        if (gameMaster.canAfford(unit)) {
+            cc.globalAlpha = 1;
+        } else {
+            cc.globalAlpha = 0.2;
+        }
         cc.drawImage(unitImages[unit], menux + 280 + (unit-4)*60, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
-    
+    cc.globalAlpha = 1;
     cc.fillStyle = "black";
     cc.font = "20px Arial";
     cc.fillText("Build ", menux+110, menuy+20);

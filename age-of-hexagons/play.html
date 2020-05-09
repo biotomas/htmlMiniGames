@@ -68,6 +68,10 @@
 
 
         function update() {
+            if (keypressed(88)) {
+                gameMaster.growTrees();
+            }
+
             tnow = d.getTime();
             scrollCanvas();
             currentLevel.drawTiles(cc, tnow);
@@ -76,10 +80,13 @@
             mx = mousePos[0];
             my = mousePos[1];
 
+            document.getElementById("cursor").innerHTML = mx+","+my;
+
             if (state == States.MOVE) {
                 cc.lineWidth = 3;
+                cc.strokeStyle = "red";
+                drawTileCursor(cc, selectedUnit.x, selectedUnit.y, tnow);
                 cc.strokeStyle = "green";
-                //drawTileCursor(cc, selectedUnit.mx, selectedUnit.my, tnow);
                 for (let value of reachableTiles) {
                     drawTileCursor(cc, value.x, value.y, tnow);
                 }
@@ -87,62 +94,61 @@
                 cc.strokeStyle = "black";
             }
 
-            if (!currentLevel.outOfBounds(mx, my)) {
-                if (keypressed('rightMouse')) {
-
-                }
+            if (state == States.MENU) {
+                updateBuildMenu();
             }
 
-            if (!currentLevel.outOfBounds(mx, my)) {
-                cc.lineWidth = 3;
-                drawTileCursor(cc, mx, my, tnow);
-                cc.lineWidth = 1;
-                document.getElementById("cursor").innerHTML = mx + "," + my;
+            while (!currentLevel.outOfBounds(mx, my)) {
+                if (state == States.BUILD) {
+                    cc.globalAlpha = 0.3;
+                    drawImage(cc, unitImages[unitToBuild], mx, my);
+                    cc.globalAlpha = 1;
+                }
                 if (keypressed('leftMouse')) {
-                    if (currentLevel.unitMap[mx][my] == Units.Town) {
-                        // turn on/off build menu
-                        selectedUnit = { mx, my };
-                        reachableTiles = null;
-                        buildMenuEnabled = !buildMenuEnabled;
-                    } else if (buildUnitSelected) {
-                        console.log('sdf');
-                        if (canBuildHere(currentLevel, mx, my, currentPlayer)) {
-                            // build unit
-                            console.log('safsfd');
-                            currentLevel.unitMap[mx][my] = buildUnitSelected;
+                    var clickedItem = currentLevel.unitMap[mx][my];
+                    var clickedPlayer = currentLevel.tileMap[mx][my];
+                    var ownTile = clickedPlayer == gameMaster.currentPlayer;
+
+                    if (ownTile && state == States.BUILD) {
+                        if (gameMaster.canBuildUnit(gameMaster.currentPlayer,
+                            mx, my, unitToBuild)) {
+                            gameMaster.buildUnit(gameMaster.currentPlayer,
+                                mx, my, unitToBuild);
+                            state = States.IDLE;
                         }
-                        selectedUnit = null;
-                    } else if (currentLevel.unitMap[mx][my]) {
-                        // select/unselect unit
-                        if (selectedUnit && selectedUnit.mx == mx && selectedUnit.my == my) {
-                            selectedUnit = null;
-                            reachableTiles = null;
+                        break;
+                    }
+                    if (ownTile && clickedItem == Units.Town) {
+                        if (state == States.MENU) {
+                            state = States.IDLE;
+                            buildMenuEnabled = false;
                         } else {
-                            selectedUnit = { mx, my };
-                            reachableTiles = getReachableTiles(gameMaster, currentPlayer,
-                                currentLevel.unitMap[mx][my], mx, my);
-                            console.log(reachableTiles);
-                            currentPlayer = currentLevel.tileMap[mx][my];
+                            state = States.MENU;
+                            buildMenuEnabled = true;
                         }
-                    } else if (selectedUnit && contains(reachableTiles, mx, my)) {
-                        // move selected unit
-                        currentLevel.unitMap[mx][my] = currentLevel.unitMap[selectedUnit.mx][selectedUnit.my];
-                        currentLevel.unitMap[selectedUnit.mx][selectedUnit.my] = null;
-                        currentLevel.tileMap[mx][my] = currentLevel.tileMap[selectedUnit.mx][selectedUnit.my];
-                        selectedUnit = { mx, my };
-                        reachableTiles = getReachableTiles(currentLevel, mx, my);
-                        currentPlayer = currentLevel.tileMap[mx][my];
+                        break;
+                    }
+                    if (ownTile && canMove(clickedItem)) {
+                        selectedUnit = { "x": mx, "y": my };
+                        reachableTiles = getReachableTiles(gameMaster, mx, my);
+                        state = States.MOVE;
+                        break;
+                    }
+                    if (state == States.MOVE) {
+                        if (gameMaster.canMoveUnit(gameMaster.currentPlayer,
+                            selectedUnit.x, selectedUnit.y, mx, my)) {
+                            gameMaster.moveUnit(gameMaster.currentPlayer,
+                                selectedUnit.x, selectedUnit.y, mx, my);
+                        }
+                        state = States.IDLE;
+                        break;
                     }
                 }
+                break;
+            }
 
-            }
-            if (buildUnitSelected) {
-                cc.globalAlpha = 0.3;
-                drawImage(cc, unitImages[buildUnitSelected], mx, my);
-                cc.globalAlpha = 1;
-            }
+
             currentLevel.drawUnits(cc, tnow);
-            updateBuildMenu();
             drawBuildMenu(cc);
             drawHud(cc);
             framerate();
