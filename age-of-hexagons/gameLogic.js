@@ -47,6 +47,16 @@ function canBuildHere(level, mx, my, currentPlayer) {
     return (level.tileMap[mx][my] == currentPlayer) && level.unitMap[mx][my] == null;
 }
 
+function mergeUnits(unit1, unit2) {
+    var min = Math.min(unit1, unit2);
+    var max = Math.max(unit1, unit2);
+    if (min == Units.Peasant) {
+        return Math.min(max+1, Units.Knight);
+    } else {
+        return Units.Knight;
+    }
+}
+
 function canMove(unit) {
     return unit > 3 && unit < 8;
 }

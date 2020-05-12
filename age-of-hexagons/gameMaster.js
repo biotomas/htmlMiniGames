@@ -29,15 +29,19 @@ class GameMaster {
     }
 
     canEnterWithUnit(player, unit, x, y) {
-        return (this.level.tileMap[x][y] == player && !this.level.unitMap[x][y])
-            || (this.level.tileMap[x][y] != player
-                && this.defense(player, x, y) <= GamePlayConstants.attack[unit])
+        if (this.level.tileMap[x][y] == player) {
+            var goalUnit = this.level.unitMap[x][y];
+            return goalUnit == null || goalUnit == Units.Tree || canMove(goalUnit);
+        } else {
+            return this.defense(player, x, y) <= GamePlayConstants.attack[unit];
+        }
     }
 
     canMoveUnit(player, fromx, fromy, tox, toy) {
         var state = this.playerStates[player];
         var unit = this.level.unitMap[fromx][fromy];
         return state.moves > 0
+            && (fromx != tox || fromy != toy)
             && this.currentPlayer == player
             && this.level.tileMap[fromx][fromy] == player
             && this.canEnterWithUnit(player, unit, tox, toy)
@@ -47,7 +51,9 @@ class GameMaster {
     defense(player, x, y) {
         var maxDefense = 0;
         var level = this.level;
-        for (let nb of getNeighbouringHexas(x, y)) {
+        var area = getNeighbouringHexas(x, y);
+        area.push({"x":x, "y":y});
+        for (let nb of area) {
             if (!level.outOfBounds(nb.x, nb.y)) {
                 var unit = level.unitMap[nb.x][nb.y];
                 if (level.tileMap[nb.x][nb.y] != player && unit != null) {
@@ -75,6 +81,7 @@ class GameMaster {
         }
         var state = this.playerStates[player];
         var goalPlayer = this.level.tileMap[tox][toy];
+        var thisUnit = this.level.unitMap[fromx][fromy];
         var goalUnit = this.level.unitMap[tox][toy];
         // cutting a tree
         if (goalUnit == Units.Tree) {
@@ -86,17 +93,27 @@ class GameMaster {
             state.tiles++;
             state.money += GamePlayConstants.conquerTileBonus;
             this.playerStates[goalPlayer].tiles--;
-            if (goalUnit != null) {
-                this.playerStates[goalPlayer].units[goalUnit]--;
+            // killing/destroying enemy unit
+            if (goalUnit != null && goalPlayer > 0) {
+                this.playerStates[goalPlayer].unitCount[goalUnit]--;
             }
             //TODO cutting up enemy territory
         }
-        // implement the move
+        // merging units
+        if (goalPlayer == player && canMove(goalUnit)) {
+            var mergedUnit = mergeUnits(goalUnit, thisUnit);
+            state.unitCount[goalUnit]--;
+            state.unitCount[thisUnit]--;
+            state.unitCount[mergedUnit]++;
+            this.level.unitMap[tox][toy] = mergedUnit;
+        } else {
+            // moving unit
+            this.level.unitMap[tox][toy] = thisUnit;
+        }
         this.level.tileMap[tox][toy] = player;
-        this.level.unitMap[tox][toy] = this.level.unitMap[fromx][fromy];
         this.level.unitMap[fromx][fromy] = null;
-        state.moves--;
-        if (state.moves == 0) {
+            state.moves--;
+            if (state.moves == 0) {
             this.endTurn(this.currentPlayer);
         }
     }

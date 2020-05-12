@@ -80,7 +80,7 @@
             mx = mousePos[0];
             my = mousePos[1];
 
-            document.getElementById("cursor").innerHTML = mx+","+my;
+            document.getElementById("cursor").innerHTML = mx + "," + my;
 
             if (state == States.MOVE) {
                 cc.lineWidth = 3;
@@ -128,12 +128,6 @@
                         }
                         break;
                     }
-                    if (ownTile && canMove(clickedItem)) {
-                        selectedUnit = { "x": mx, "y": my };
-                        reachableTiles = getReachableTiles(gameMaster, mx, my);
-                        state = States.MOVE;
-                        break;
-                    }
                     if (state == States.MOVE) {
                         if (gameMaster.canMoveUnit(gameMaster.currentPlayer,
                             selectedUnit.x, selectedUnit.y, mx, my)) {
@@ -141,6 +135,12 @@
                                 selectedUnit.x, selectedUnit.y, mx, my);
                         }
                         state = States.IDLE;
+                        break;
+                    }
+                    if (ownTile && canMove(clickedItem)) {
+                        selectedUnit = { "x": mx, "y": my };
+                        reachableTiles = getReachableTiles(gameMaster, mx, my);
+                        state = States.MOVE;
                         break;
                     }
                 }
