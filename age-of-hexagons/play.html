@@ -45,19 +45,6 @@
             setInterval(update, 1000 / 10);
         }
 
-        function changeMapSize() {
-            new_width = document.getElementById("mapWidth").value;
-            new_heigth = document.getElementById("mapHeight").value;
-            currentLevel.resize(new_width, new_heigth);
-        }
-
-        States = {
-            IDLE: 0,
-            MOVE: 1,
-            BUILD: 2,
-            MENU: 3,
-        }
-
 
         currentLevel = Object.assign(new Level(1, 1), maps[0]);
         playerNames = ["nature", "Marc", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
