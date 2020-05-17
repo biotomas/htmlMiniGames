@@ -9,12 +9,25 @@ var Units = {
     Knight: 7
 }
 
+var UnitNames = ["Tree", "Tower", "Village", "Farm", "Peasant", "Spearman", "Swordsman",
+"Knight"];
+var UnitDescriptions = [
+    "Gives 3 gold when cut, can spread after each round", 
+    "defends surrounding tiles against peasants and spearmen",
+    "supplies you units, allows to build new ones",
+    "produces regular income, defends itself against peasants",
+    "can cut trees, kill peasants and conquer tiles",
+    "can destroy farms and kill spearmen and peasants",
+    "can destroy and kill all but villages and knights",
+    "can destroy every unit and structure in the game"
+];
+
 var GamePlayConstants = {
     // The ordering in the arrays below corresponds to Units above
     defense: [0, 3, 4, 2, 1, 2, 3, 4],
     attack: [0, 0, 0, 0, 1, 2, 3, 4],
     range: [0, 0, 0, 0, 3, 2, 1, 3],
-    incomes: [0, 0, 10, 5, -5, -10, -20, -30],
+    incomes: [0, -5, 5, 5, -5, -10, -20, -30],
     cost: [0, 10, 30, 10, 10, 20, 30, 40],
     tileIncome: 1,
     conquerTileBonus: 2,

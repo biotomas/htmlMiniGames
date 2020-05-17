@@ -65,17 +65,17 @@ class GameMaster {
         var maxDefense = 0;
         var level = this.level;
         var area = getNeighbouringHexas(x, y);
-        area.push({ "x": x, "y": y });
+        if (level.unitMap[x][y] != null) {
+            maxDefense = GamePlayConstants.defense[level.unitMap[x][y]];
+        }
         for (let nb of area) {
             if (!level.outOfBounds(nb.x, nb.y)) {
                 var unit = level.unitMap[nb.x][nb.y];
-                if (level.tileMap[nb.x][nb.y] != player && unit != null) {
-                    console.log("defends ", unit);
+                if (level.tileMap[nb.x][nb.y] != player && unit == Units.Tower) {
                     maxDefense = Math.max(maxDefense, GamePlayConstants.defense[unit]);
                 }
             }
         }
-        console.log("defense x,y,val: ", x, y, maxDefense);
         return maxDefense;
     }
 

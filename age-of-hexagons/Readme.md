@@ -2,7 +2,6 @@
 
 In order or priority
 
-1. Tooltips for units to be built
 1. Visual cues for game events
    1. "animated" movement of units
    1. fade-out of destroyed units
