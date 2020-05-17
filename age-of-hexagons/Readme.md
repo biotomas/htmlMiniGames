@@ -2,14 +2,13 @@
 
 In order or priority
 
-1. Fix the level editor
-1. Splitting territories properly
 1. Tooltips for units to be built
 1. Visual cues for game events
    1. "animated" movement of units
    1. fade-out of destroyed units
    1. fade-out of units killed by famine
-1. random level generator (with symmetry)
+1. symmetry for level editor
+1. random level generato
 1. End of game detection / player killed detection
 1. Multiplayer
    1. lobby

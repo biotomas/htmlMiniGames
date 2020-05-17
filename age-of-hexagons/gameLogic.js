@@ -14,13 +14,13 @@ var GamePlayConstants = {
     defense: [0, 3, 4, 2, 1, 2, 3, 4],
     attack: [0, 0, 0, 0, 1, 2, 3, 4],
     range: [0, 0, 0, 0, 3, 2, 1, 3],
-    incomes: [0, 0, 11, 6, -5, -10, -20, -30],
+    incomes: [0, 0, 10, 5, -5, -10, -20, -30],
     cost: [0, 10, 30, 10, 10, 20, 30, 40],
     tileIncome: 1,
-    conquerTileBonus: 3,
+    conquerTileBonus: 2,
     cutTreeBonus: 3,
     movesPerTurn: 3,
-    startMoney:10,
+    startMoney: 10,
     treeSpawnProbability: 0.01,
     treeReproduceProbability: 0.2,
 }
@@ -58,7 +58,7 @@ function mergeUnits(unit1, unit2) {
     var min = Math.min(unit1, unit2);
     var max = Math.max(unit1, unit2);
     if (min == Units.Peasant) {
-        return Math.min(max+1, Units.Knight);
+        return Math.min(max + 1, Units.Knight);
     } else {
         return Units.Knight;
     }
@@ -73,6 +73,27 @@ function getNeighbouringHexas(x, y) {
     list = x % 2 == 0 ? hexagonNeighbourhoodEven : hexagonNeighbourhoodOdd;
     for (let coord of list) {
         result.push({ "x": x + coord.x, "y": y + coord.y });
+    }
+    return result;
+}
+
+function getNeighbourTiles(level, x, y) {
+    var result = new Set();
+    for (let n of getNeighbouringHexas(x, y)) {
+        if (canReach(level, n.x, n.y)) {
+            result.add(n);
+        }
+    }
+    return result;
+}
+
+function allRaeachableWithinNation(level, x, y) {
+    var result = new Set();
+    var nation = level.tileMap[x][y];
+    for (let r of getReachableNodes(level, x, y, null)) {
+        if (level.tileMap[r.x][r.y] == nation) {
+            result.add(r);
+        }
     }
     return result;
 }
@@ -102,18 +123,19 @@ function getReachableNodes(level, x, y, distance) {
     var reachable = new Set();
     var nation = level.tileMap[x][y];
     var queue = [];
-    queue.push({"x":x,"y":y,"d":0});
+    queue.push({ "x": x, "y": y, "d": 0 });
     while (queue.length > 0) {
         var node = queue.shift();
-        if (visited.has(node.x+":"+node.y)) {
+        if (visited.has(node.x + ":" + node.y)) {
             continue;
         }
-        visited.add(node.x+":"+node.y);
+        visited.add(node.x + ":" + node.y);
         if (canReach(level, node.x, node.y)) {
             reachable.add({ "x": node.x, "y": node.y });
-            if (node.d < distance && level.tileMap[node.x][node.y] == nation) {
+            if ((distance == null || node.d < distance)
+                && level.tileMap[node.x][node.y] == nation) {
                 for (let neigh of getNeighbouringHexas(node.x, node.y)) {
-                    queue.push({"x":neigh.x,"y":neigh.y,"d":node.d + 1});
+                    queue.push({ "x": neigh.x, "y": neigh.y, "d": node.d + 1 });
                 }
             }
         }
@@ -131,7 +153,7 @@ class PlayerState {
         this.money = GamePlayConstants.startMoney;
         this.moves = GamePlayConstants.movesPerTurn;
         this.tiles = 0;
-        this.unitCount = [0,0,0,0,0,0,0,0];
+        this.unitCount = [0, 0, 0, 0, 0, 0, 0, 0];
     }
 
     endTurn() {

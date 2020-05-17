@@ -5,10 +5,10 @@ var graphicConstants = {
 
 var playerColors = [
     "#aaaaaa",
+    "#e6beff",
     "#ffd8b1",
     "#fffac8",
     "#aaffc3",
-    "#e6beff",
     "#42d4f4",
     "#bfef45",
     "#469990",

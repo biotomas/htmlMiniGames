@@ -7,11 +7,24 @@ class GameMaster {
         this.playerStates = new Array(players + 1);
         for (var pi = 0; pi <= players; pi++) {
             this.playerStates[pi] = new PlayerState();
-            this.playerStates[pi].tiles = this.countUnits(pi, null);
+            this.playerStates[pi].tiles = this.countTiles(pi) - this.countUnits(pi, Units.Tree);
             for (var unit = 1; unit < 8; unit++) {
                 this.playerStates[pi].unitCount[unit] = this.countUnits(pi, unit);
             }
         }
+    }
+
+    countTiles(player) {
+        var tiles = this.level.tileMap;
+        var count = 0;
+        for (var x = 0; x < this.level.level_width; x++) {
+            for (var y = 0; y < this.level.level_heigth; y++) {
+                if (tiles[x][y] == player) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     countUnits(player, unit) {
@@ -52,7 +65,7 @@ class GameMaster {
         var maxDefense = 0;
         var level = this.level;
         var area = getNeighbouringHexas(x, y);
-        area.push({"x":x, "y":y});
+        area.push({ "x": x, "y": y });
         for (let nb of area) {
             if (!level.outOfBounds(nb.x, nb.y)) {
                 var unit = level.unitMap[nb.x][nb.y];
@@ -90,6 +103,7 @@ class GameMaster {
         }
         // entering foreign territory
         if (goalPlayer != player) {
+            this.level.tileMap[tox][toy] = player;
             state.tiles++;
             state.money += GamePlayConstants.conquerTileBonus;
             this.playerStates[goalPlayer].tiles--;
@@ -97,7 +111,31 @@ class GameMaster {
             if (goalUnit != null && goalPlayer > 0) {
                 this.playerStates[goalPlayer].unitCount[goalUnit]--;
             }
-            //TODO cutting up enemy territory
+            for (let n of getNeighbourTiles(this.level, tox, toy)) {
+                var owner = this.level.tileMap[n.x][n.y];
+                if (owner == 0 || owner == player) {
+                    continue;
+                }
+                var reachables = allRaeachableWithinNation(this.level, n.x, n.y);
+                var townFound = false;
+                for (let r of reachables) {
+                    if (this.level.unitMap[r.x][r.y] == Units.Town) {
+                        townFound = true;
+                        break;
+                    }
+                }
+                if (townFound) {
+                    continue;
+                }
+                // a territory without a town, all unit die
+                for (let r of reachables) {
+                    var unitToDie = this.level.unitMap[r.x][r.y];
+                    if (unitToDie != null) {
+                        this.level.unitMap[r.x][r.y] = null;
+                        this.playerStates[goalPlayer].unitCount[unitToDie]--;
+                    }
+                }
+            }
         }
         // merging units
         if (goalPlayer == player && canMove(goalUnit)) {
@@ -112,8 +150,8 @@ class GameMaster {
         }
         this.level.tileMap[tox][toy] = player;
         this.level.unitMap[fromx][fromy] = null;
-            state.moves--;
-            if (state.moves == 0) {
+        state.moves--;
+        if (state.moves == 0) {
             this.endTurn(this.currentPlayer);
         }
     }
@@ -137,7 +175,6 @@ class GameMaster {
             var state = this.playerStates[player];
             state.unitCount[unit]++;
             state.moves--;
-            state.tiles--;
             state.money -= GamePlayConstants.cost[unit];
             if (state.moves == 0) {
                 this.endTurn(this.currentPlayer);
@@ -171,7 +208,6 @@ class GameMaster {
             for (var y = 0; y < this.level.level_heigth; y++) {
                 if (tiles[x][y] == player && canMove(units[x][y])) {
                     units[x][y] = null;
-                    this.playerStates[player].tiles++;
                 }
             }
         }

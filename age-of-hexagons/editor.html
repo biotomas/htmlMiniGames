@@ -26,7 +26,9 @@
             Width:<input id="mapWidth" type="text" value="15"></input>
             Height:<input id="mapHeight" type="text" value="15"></input>
             <input onclick="changeMapSize()" type="button" value="Update Map Size"></input>
-            Use 0-8 to select player tile, X to print level (to console)
+            <p>
+                Use 0-8 to select player tile, T to place Trees, X to print level (to console)
+            </p>
         </div>
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
@@ -100,6 +102,10 @@
             }
             if (keyState[88]) {
                 console.log(currentLevel.toJson());
+            }
+
+            if (keyState[84]) {
+                unitToBuild = Units.Tree;
             }
 
             cc.globalAlpha = 1;
