@@ -3,6 +3,16 @@ hudy = 10;
 hudHeigth = 65;
 hudPerPlayer = 80;
 
+function checkEndTurnPressed() {
+    //hudx + 5 + playerIndex * hudPerPlayer, hudy + hudHeigth + 5, hudPerPlayer, 20);
+    var buttonx = hudx + 5 + gameMaster.currentPlayer * hudPerPlayer;
+    var buttony = hudy + hudHeigth + 5;
+    if (mousex >= buttonx && mousex <= buttonx + hudPerPlayer - 10 &&
+        mousey >= buttony && mousey <= buttony + 20 && keypressed('leftMouse')) {
+        gameMaster.endTurn(gameMaster.currentPlayer);
+    }
+}
+
 function drawHud(cc) {
     hudWidth = hudPerPlayer + hudPerPlayer * gameMaster.players;
 
@@ -29,11 +39,11 @@ function drawHud(cc) {
             cc.strokeStyle = "black";
             cc.fillStyle = "#ddd";
             cc.rect(hudx + 5 + playerIndex * hudPerPlayer, hudy + hudHeigth + 5,
-                hudPerPlayer, 20);
+                hudPerPlayer - 10, 20);
             cc.stroke();
             cc.fill();
             cc.fillStyle = "black";
-            cc.fillText("End Turn", hudx + 20 + playerIndex * hudPerPlayer, hudy + hudHeigth + 20);
+            cc.fillText("End Turn", hudx + 10 + playerIndex * hudPerPlayer, hudy + hudHeigth + 20);
             cc.font = "bold 15px Arial";
         }
         cc.fillText(playerNames[playerIndex], hudx + 5 + playerIndex * hudPerPlayer, hudy + 15);

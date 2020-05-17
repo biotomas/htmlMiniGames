@@ -2,7 +2,6 @@
 
 In order or priority
 
-1. End Turn button
 1. Fix the level editor
 1. Splitting territories properly
 1. Tooltips for units to be built
