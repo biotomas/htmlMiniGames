@@ -6,6 +6,7 @@ menuActive = false;
 buildUnit = 0;
 buildUnitSelected = 0;
 buildMenuEnabled = false;
+buildMenuEditorMode = false;
 
 function updateBuildMenu() {
     if (!buildMenuEnabled) {
@@ -27,13 +28,16 @@ function updateBuildMenu() {
         } else {
             buildUnit = 0;
         }
-        if (keypressed('leftMouse') && gameMaster.canAfford(buildUnit)) {
+        if (keypressed('leftMouse') && (buildMenuEditorMode || gameMaster.canAfford(buildUnit))) {
             state = States.BUILD;
+            console.log("selected unit");
             unitToBuild = buildUnit;
-            buildMenuEnabled = false;
+            buildMenuEnabled = buildMenuEditorMode;
         }
+    } else if (buildMenuEditorMode) {
+        menuActive = false;
     } else {
-        buildUnit = 0;
+        buildUnit = null;
         menuActive = false;
         if (keypressed('leftMouse')) {
             state = States.IDLE;
@@ -59,7 +63,7 @@ function drawBuildMenu(cc) {
     cc.stroke();
     cc.fill();
     for (var unit = 1; unit <= 3; unit++) {
-        if (gameMaster.canAfford(unit)) {
+        if (buildMenuEditorMode || gameMaster.canAfford(unit)) {
             cc.globalAlpha = 1;
         } else {
             cc.globalAlpha = 0.2;
@@ -67,7 +71,7 @@ function drawBuildMenu(cc) {
         cc.drawImage(unitImages[unit], menux + (unit-1)*80, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     for (var unit = 4; unit <= 7; unit++) {
-        if (gameMaster.canAfford(unit)) {
+        if (buildMenuEditorMode || gameMaster.canAfford(unit)) {
             cc.globalAlpha = 1;
         } else {
             cc.globalAlpha = 0.2;

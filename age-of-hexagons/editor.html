@@ -16,6 +16,8 @@
     <script src="gameLogic.js"></script>
     <script src="graphics.js"></script>
     <script src="maps.js"></script>
+    <script src="buildMenu.js"></script>
+
 </head>
 
 <body>
@@ -24,16 +26,17 @@
             Width:<input id="mapWidth" type="text" value="15"></input>
             Height:<input id="mapHeight" type="text" value="15"></input>
             <input onclick="changeMapSize()" type="button" value="Update Map Size"></input>
-            Use 0-8 to select player tile, use Q,W,E, ... P to select units, X to print level (to console)
+            Use 0-8 to select player tile, X to print level (to console)
         </div>
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
     </div>
     <script>
         //currentLevel = new Level(15,15);
-        currentLevel = Object.assign(new Level(1,1), maps[0]);
-
-
+        currentLevel = Object.assign(new Level(1, 1), maps[0]);
+        buildMenuEditorMode = true;
+        buildMenuEnabled = true;
+        state = States.IDLE;
 
         d = new Date();
         lastframe = d.getTime();
@@ -46,12 +49,12 @@
             c.width = window.innerWidth - 100;
             c.height = window.innerHeight - 100;
             cc = c.getContext('2d');
-            setInterval(update, 1000 / 60);
+            setInterval(update, 1000 / 10);
         }
 
 
         currentPlayerTile = null;
-        currentUnit = null;
+        unitToBuild = null;
 
         function changeMapSize() {
             new_width = document.getElementById("mapWidth").value;
@@ -79,15 +82,7 @@
             for (i = 48; i < 58; i++) {
                 if (keyState[i]) {
                     currentPlayerTile = i - 48;
-                    currentUnit = null;
-                }
-            }
-            // codes of Q,W,E,R,...,P
-            keys = [81, 87, 69, 82, 84, 89, 85, 73];
-            for (i = 0; i < 8; i++) {
-                if (keyState[keys[i]]) {
-                    currentPlayerTile = null;
-                    currentUnit = i;
+                    unitToBuild = null;
                 }
             }
 
@@ -107,42 +102,48 @@
                 console.log(currentLevel.toJson());
             }
 
-            currentLevel.draw(cc, tnow);
+            cc.globalAlpha = 1;
+            currentLevel.drawTiles(cc, tnow);
+            currentLevel.drawUnits(cc, tnow);
             currentLevel.drawBorder(cc);
+            drawBuildMenu(cc);
+            updateBuildMenu();
 
 
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
 
-            if (mx < 0 || my < 0 || mx >= currentLevel.level_width || my >= currentLevel.level_heigth) {
+            if (currentLevel.outOfBounds(mx, my) || menuActive) {
                 return;
             }
 
-            cc.globalAlpha = 0.5;
-            if (currentPlayerTile != null) {
-                if (!keyState['rightMouse']) {
-                    drawTile(cc, mx, my, currentPlayerTile);
+            if (keypressed('rightMouse')) {
+                if (unitToBuild != null) {
+                    unitToBuild = null;
+                } else if (currentLevel.unitMap[mx][my] != null) {
+                    currentLevel.unitMap[mx][my] = null;
+                } else if (currentLevel.tileMap[mx][my] != null) {
+                    currentLevel.tileMap[mx][my] = null;
+                } else {
+                    currentPlayerTile = null;
                 }
-                if (keyState['leftMouse']) {
+            }
 
+            cc.globalAlpha = 0.5;
+            if (unitToBuild != null) {
+                drawImage(cc, unitImages[unitToBuild], mx, my);
+                if (keypressed('leftMouse')) {
+                    currentLevel.unitMap[mx][my] = unitToBuild;
+                }
+            }
+
+            if (currentPlayerTile != null) {
+                drawTile(cc, mx, my, currentPlayerTile);
+                if (keypressed('leftMouse')) {
                     currentLevel.tileMap[mx][my] = currentPlayerTile;
                 }
-                if (keyState['rightMouse']) {
-                    currentLevel.tileMap[mx][my] = null;
-                }
             }
-
-            if (currentUnit != null) {
-                drawImage(cc, unitImages[currentUnit], mx, my);
-                if (keyState['leftMouse']) {
-                    currentLevel.unitMap[mx][my] = currentUnit;
-                }
-                if (keyState['rightMouse']) {
-                    currentLevel.unitMap[mx][my] = null;
-                }
-            }
-            cc.globalAlpha = 1;
 
         }
 

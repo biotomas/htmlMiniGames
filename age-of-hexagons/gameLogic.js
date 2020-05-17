@@ -25,6 +25,13 @@ var GamePlayConstants = {
     treeReproduceProbability: 0.2,
 }
 
+States = {
+    IDLE: 0,
+    MOVE: 1,
+    BUILD: 2,
+    MENU: 3,
+}
+
 var hexagonNeighbourhoodEven = new Set([
     { "x": -1, "y": -1 },
     { "x": -1, "y": 0 },
