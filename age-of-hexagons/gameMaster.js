@@ -88,7 +88,7 @@ class GameMaster {
         return false;
     }
 
-    moveUnit(player, fromx, fromy, tox, toy) {
+    moveUnit(player, fromx, fromy, tox, toy, animation) {
         if (!this.canMoveUnit(player, fromx, fromy, tox, toy)) {
             console.error("Invalid move");
         }
@@ -96,10 +96,15 @@ class GameMaster {
         var goalPlayer = this.level.tileMap[tox][toy];
         var thisUnit = this.level.unitMap[fromx][fromy];
         var goalUnit = this.level.unitMap[tox][toy];
+        var to = {"x":tox,"y":toy};
         // cutting a tree
         if (goalUnit == Units.Tree) {
             state.money += GamePlayConstants.cutTreeBonus;
             state.tiles++;
+            this.level.unitMap[tox][toy] = null;
+            animation.addAnimation(new Animation(AnimationType.FadeOut,
+                to, to, Units.Tree, thisUnit, 1000));
+    
         }
         // entering foreign territory
         if (goalPlayer != player) {
@@ -110,6 +115,9 @@ class GameMaster {
             // killing/destroying enemy unit
             if (goalUnit != null && goalPlayer > 0) {
                 this.playerStates[goalPlayer].unitCount[goalUnit]--;
+                this.level.unitMap[tox][toy] = null;
+                animation.addAnimation(new Animation(AnimationType.FadeOut,
+                    to, to, goalUnit, null, 1000));
             }
             for (let n of getNeighbourTiles(this.level, tox, toy)) {
                 var owner = this.level.tileMap[n.x][n.y];
@@ -127,12 +135,17 @@ class GameMaster {
                 if (townFound) {
                     continue;
                 }
-                // a territory without a town, all unit die
+                // a territory without a town, all units die
                 for (let r of reachables) {
+                    this.level.tileMap[r.x][r.y] = 0;
+                    this.playerStates[goalPlayer].tiles--;
+
                     var unitToDie = this.level.unitMap[r.x][r.y];
-                    if (unitToDie != null) {
+                    if (unitToDie != null && unitToDie != Units.Tree) {
                         this.level.unitMap[r.x][r.y] = null;
                         this.playerStates[goalPlayer].unitCount[unitToDie]--;
+                        animation.addAnimation(new Animation(AnimationType.FadeOut,
+                            r, r, unitToDie, null, 1000));
                     }
                 }
             }
@@ -143,10 +156,12 @@ class GameMaster {
             state.unitCount[goalUnit]--;
             state.unitCount[thisUnit]--;
             state.unitCount[mergedUnit]++;
-            this.level.unitMap[tox][toy] = mergedUnit;
+            animation.addAnimation(new Animation(AnimationType.Move,
+                {"x":fromx,"y":fromy}, {"x":tox,"y":toy}, thisUnit, mergedUnit, 1000));
         } else {
             // moving unit
-            this.level.unitMap[tox][toy] = thisUnit;
+            animation.addAnimation(new Animation(AnimationType.Move,
+                {"x":fromx,"y":fromy}, {"x":tox,"y":toy}, thisUnit, thisUnit, 1000));
         }
         this.level.tileMap[tox][toy] = player;
         this.level.unitMap[fromx][fromy] = null;
@@ -248,8 +263,10 @@ class GameMaster {
 
     addTree(x, y) {
         var tiles = this.level.tileMap;
-        var units = this.level.unitMap;
-        units[x][y] = Units.Tree;
+        var to = {"x":x,"y":y};
+        animation.addAnimation(new Animation(AnimationType.FadeIn,
+            to, to, Units.Tree, Units.Tree, 1000));
+
         if (tiles[x][y] > 0) {
             this.playerStates[tiles[x][y]].tiles--;
         }

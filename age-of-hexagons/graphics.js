@@ -84,7 +84,11 @@ function pixelsToCoords(x, y) {
 
 function drawImage(cc, img, x, y) {
     pos = coordsToPixels(x, y);
-    cc.drawImage(img, pos[0] - graphicConstants.tileWidth / 2, pos[1] - graphicConstants.tileHeight);
+    drawImagePixels(cc, img, pos[0], pos[1]);
+}
+
+function drawImagePixels(cc, img, x, y) {
+    cc.drawImage(img, x - graphicConstants.tileWidth / 2, y - graphicConstants.tileHeight);
 }
 
 function drawTile(cc, x, y, color) {

@@ -43,6 +43,7 @@ States = {
     MOVE: 1,
     BUILD: 2,
     MENU: 3,
+    ANIMATION: 4,
 }
 
 var hexagonNeighbourhoodEven = new Set([

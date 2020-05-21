@@ -19,6 +19,7 @@
     <script src="buildMenu.js"></script>
     <script src="gameMaster.js"></script>
     <script src="hud.js"></script>
+    <script src="animations.js"></script>
 </head>
 
 <body>
@@ -47,30 +48,34 @@
 
 
         currentLevel = Object.assign(new Level(1, 1), maps[0]);
-        playerNames = ["nature", "Marc", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
+        playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
         selectedUnit = null;
         reachableTiles = new Set();
         state = States.IDLE;
         gameMaster = new GameMaster(currentLevel, 2);
-
-
+        animation = new AnimationProvider();
+        
+        
         function update() {
-            if (keypressed(88)) {
-                gameMaster.growTrees();
-            }
-
-            checkEndTurnPressed();
-
+            console.log(state);
+            d = new Date();
             tnow = d.getTime();
             scrollCanvas();
             currentLevel.drawTiles(cc, tnow);
-
+            if (animation.updateAnimations(cc, tnow)) {
+                state = States.ANIMATION;
+            } else if (state == States.ANIMATION) {
+                state = States.IDLE;
+            }
+            checkEndTurnPressed();
+            
+            
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
-
+            
             document.getElementById("cursor").innerHTML = mx + "," + my;
-
+            
             if (state == States.MOVE) {
                 cc.lineWidth = 3;
                 cc.strokeStyle = "red";
@@ -82,6 +87,11 @@
                 cc.lineWidth = 1;
                 cc.strokeStyle = "black";
             }
+            
+            currentLevel.drawUnits(cc, tnow);
+            drawBuildMenu(cc);
+            drawHud(cc);
+            framerate();
 
             if (state == States.MENU) {
                 updateBuildMenu();
@@ -121,12 +131,12 @@
                         if (gameMaster.canMoveUnit(gameMaster.currentPlayer,
                             selectedUnit.x, selectedUnit.y, mx, my)) {
                             gameMaster.moveUnit(gameMaster.currentPlayer,
-                                selectedUnit.x, selectedUnit.y, mx, my);
+                                selectedUnit.x, selectedUnit.y, mx, my, animation);
                         }
                         state = States.IDLE;
                         break;
                     }
-                    if (ownTile && canMove(clickedItem)) {
+                    if (state != States.ANIMATION && ownTile && canMove(clickedItem)) {
                         selectedUnit = { "x": mx, "y": my };
                         reachableTiles = getReachableTiles(gameMaster, mx, my);
                         state = States.MOVE;
@@ -137,10 +147,6 @@
             }
 
 
-            currentLevel.drawUnits(cc, tnow);
-            drawBuildMenu(cc);
-            drawHud(cc);
-            framerate();
         }
 
         function framerate() {
