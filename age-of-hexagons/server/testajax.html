@@ -19,9 +19,9 @@
             // Now get the value from user and pass it to
             // server script.
             var name = document.getElementById('name').value;
-            ajaxRequest.open("POST", "http://freelunch.eu/hexas.php", true);            
+            ajaxRequest.open("POST", "http://localhost/hexas/hexas.php", true);            
             ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            ajaxRequest.send("operation=insert&name=" + name + "&version=5&players=6&data='lol'"); 
+            ajaxRequest.send("op=move&gid=1&step=3&move=lol"); 
          }
          //-->
       </script>

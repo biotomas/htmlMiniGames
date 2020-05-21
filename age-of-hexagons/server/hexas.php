@@ -1,8 +1,8 @@
 <?php
-$servername = "TODO";
-$username = "TODO";
-$password = "TODO";
-$dbname = "TODO";
+$servername = "localhost";
+$username = "hexas";
+$password = "hexas";
+$dbname = "hexas";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -11,17 +11,35 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$op = $_POST['operation'];
-var_dump($_POST);
-var_dump($_GET);
-echo "hello {$op}</br>";
+$op = $_POST['op'];
+//var_dump($_POST);
+//var_dump($_GET);
 
-if ($op == 'insert') {
-	$name = $_POST['name'];
-	$version = $_POST['version'];
-	$players = $_POST['players'];
-	$data = $_POST['data'];
-	$sql = "INSERT INTO `d225003_hexas`.`levels` (`name`, `version`, `players`, `data`) VALUES ('{$name}', '{$version}', '{$players}', '{$data}')";
+if ($op == 'move') {
+	$gid = $_POST['gid'];
+	$step = $_POST['step'];
+	$move = $_POST['move'];
+	$sql = "SELECT max(step) from gameMoves where gameId = '{$gid}'";
+	$result = $conn->query($sql);
+	$maxStep = $result->fetch_assoc()["max(step)"];
+	echo "hello";
+	echo $maxStep;
+	echo "step is ";
+	echo $step;
+	if ($step == $maxStep + 1) {
+		$sql = "INSERT INTO gameMoves (`gameId`, `step`, `move`) VALUES ('{$gid}', '{$step}', '{$move}')";
+		echo $sql;
+		$result = $conn->query($sql);
+		var_dump($result);
+		//var_dump($result->fetch_assoc());
+		//$maxStep = $result->fetch_assoc()["max(step)"];
+		echo "ok";
+	} else {
+		echo "nope";
+	}
+	die;
+
+	$sql = "INSERT INTO gameMoves (`name`, `version`, `players`, `data`) VALUES ('{$name}', '{$version}', '{$players}', '{$data}')";
 	$result = $conn->query($sql);
 	echo "insert success";
 } else if ($op == 'get') {
@@ -32,8 +50,8 @@ if ($op == 'insert') {
 	echo $result->fetch_assoc();
 }
 
-
-$sql = "SELECT * FROM levels";
+echo "<hr/>";
+$sql = "SELECT * FROM gameMoves";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {

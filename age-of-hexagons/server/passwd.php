@@ -1,4 +1,6 @@
 <?php
+echo "hello";
+
 $servername = "md51.wedos.net";
 $username = "w225003_hexas";
 $password = "jirae44@fe233221FDDW";
@@ -10,6 +12,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
+
+echo "connection ok";
+exit;
 
 $op = $_POST['operation'];
 var_dump($_POST);
