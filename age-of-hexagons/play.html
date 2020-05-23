@@ -112,7 +112,7 @@
                 }
             }
 
-            if (multiPlayerGame) {
+            if (state != States.ANIMATION && multiPlayerGame) {
                 if (gameMaster.currentPlayer != localPlayer) {
                     var moves = getMoves(gameId, step);
                     for (let move of moves) {
@@ -128,6 +128,7 @@
                             gameMaster.endTurn(gameMaster.currentPlayer);
                         }
                         step++;
+                        break;
                     }
                     return;
                 }
