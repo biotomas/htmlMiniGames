@@ -153,6 +153,7 @@ function getReachableNodes(level, x, y, distance) {
                 }
             }
         }
+
     }
     return reachable;
 }

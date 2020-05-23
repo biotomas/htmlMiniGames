@@ -7,7 +7,7 @@ function initializeInput(c) {
 	window.addEventListener('keydown',function(e){
 			keyState[e.keyCode] = true;
 			keyDown[e.keyCode] = true;
-			console.log(e.keyCode);
+			//console.log(e.keyCode);
 	},true);    
 
 	window.addEventListener('keyup',function(e){

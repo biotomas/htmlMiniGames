@@ -5,6 +5,7 @@ class GameMaster {
         this.players = players;
         this.currentPlayer = 1;
         this.playerStates = new Array(players + 1);
+        this.pseudoRnd = Math.PI;
         for (var pi = 0; pi <= players; pi++) {
             this.playerStates[pi] = new PlayerState();
             this.playerStates[pi].tiles = this.countTiles(pi) - this.countUnits(pi, Units.Tree);
@@ -12,6 +13,11 @@ class GameMaster {
                 this.playerStates[pi].unitCount[unit] = this.countUnits(pi, unit);
             }
         }
+    }
+
+    nextRnd() {
+        this.pseudoRnd = (this.pseudoRnd * Math.E) % 1.0;
+        return this.pseudoRnd;
     }
 
     countTiles(player) {
@@ -90,7 +96,7 @@ class GameMaster {
 
     moveUnit(player, fromx, fromy, tox, toy, animation) {
         if (!this.canMoveUnit(player, fromx, fromy, tox, toy)) {
-            console.error("Invalid move");
+            console.error("Invalid move lol");
         }
         var state = this.playerStates[player];
         var goalPlayer = this.level.tileMap[tox][toy];
@@ -241,7 +247,7 @@ class GameMaster {
                 if (tiles[x][y] == null) {
                     continue;
                 }
-                var rnd = Math.random();
+                var rnd = this.nextRnd();
                 // possibly spawn a tree from a tree
                 if (units[x][y] == Units.Tree && rnd < GamePlayConstants.treeReproduceProbability) {
                     for (let neigh of getNeighbouringHexas(x, y)) {

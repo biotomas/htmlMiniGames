@@ -9,8 +9,9 @@ function checkEndTurnPressed() {
     var buttony = hudy + hudHeigth + 5;
     if (mousex >= buttonx && mousex <= buttonx + hudPerPlayer - 10 &&
         mousey >= buttony && mousey <= buttony + 20 && keypressed('leftMouse')) {
-        gameMaster.endTurn(gameMaster.currentPlayer);
+        return true;
     }
+    return false;
 }
 
 function drawHud(cc) {
