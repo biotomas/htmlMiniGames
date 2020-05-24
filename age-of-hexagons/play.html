@@ -45,7 +45,7 @@
         framecount = 0;
 
         // multiplayer data
-        multiPlayerGame = true;
+        multiPlayerGame = false;
         localPlayer = null;
         gameId = 27;
         step = 1;
@@ -65,12 +65,11 @@
         selectedUnit = null;
         reachableTiles = new Set();
         state = States.IDLE;
-        gameMaster = new GameMaster(currentLevel, 2);
+        gameMaster = new GameMaster(currentLevel, 3);
         animation = new AnimationProvider();
-        
-        
+
+
         function update() {
-            //console.log(state);
             d = new Date();
             tnow = d.getTime();
             scrollCanvas();
@@ -80,14 +79,14 @@
             } else if (state == States.ANIMATION) {
                 state = States.IDLE;
             }
-            
-            
+
+
             mousePos = pixelsToCoords(mousex, mousey);
             mx = mousePos[0];
             my = mousePos[1];
-            
+
             document.getElementById("cursor").innerHTML = mx + "," + my;
-            
+
             if (state == States.MOVE) {
                 cc.lineWidth = 3;
                 cc.strokeStyle = "red";
@@ -99,7 +98,7 @@
                 cc.lineWidth = 1;
                 cc.strokeStyle = "black";
             }
-            
+
             currentLevel.drawUnits(cc, tnow);
             drawBuildMenu(cc);
             drawHud(cc);
@@ -110,6 +109,11 @@
                     sendEndTurn(gameId, step);
                     step++;
                 }
+            }
+
+            if (state != States.ANIMATION
+                && gameMaster.playerStates[gameMaster.currentPlayer].moves == 0) {
+                gameMaster.endTurn(gameMaster.currentPlayer);
             }
 
             if (state != States.ANIMATION && multiPlayerGame) {
@@ -178,7 +182,7 @@
                             gameMaster.moveUnit(gameMaster.currentPlayer,
                                 selectedUnit.x, selectedUnit.y, mx, my, animation);
                             if (multiPlayerGame) {
-                                sendMove(gameId, step, selectedUnit.x, selectedUnit.y,mx,my);
+                                sendMove(gameId, step, selectedUnit.x, selectedUnit.y, mx, my);
                                 step++;
                             }
                         }

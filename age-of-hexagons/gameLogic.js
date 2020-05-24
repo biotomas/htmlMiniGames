@@ -6,7 +6,8 @@ var Units = {
     Peasant: 4,
     Spearman: 5,
     Swordsman: 6,
-    Knight: 7
+    Knight: 7,
+    Reserved: 8,
 }
 
 var UnitNames = ["Tree", "Tower", "Village", "Farm", "Peasant", "Spearman", "Swordsman",
@@ -35,7 +36,7 @@ var GamePlayConstants = {
     movesPerTurn: 3,
     startMoney: 10,
     treeSpawnProbability: 0.01,
-    treeReproduceProbability: 0.2,
+    treeReproduceProbability: 0.5,
 }
 
 States = {

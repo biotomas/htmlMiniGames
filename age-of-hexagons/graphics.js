@@ -88,7 +88,8 @@ function drawImage(cc, img, x, y) {
 }
 
 function drawImagePixels(cc, img, x, y) {
-    cc.drawImage(img, x - graphicConstants.tileWidth / 2, y - graphicConstants.tileHeight);
+    cc.drawImage(img, x - graphicConstants.tileWidth / 2 + 10,
+        y - graphicConstants.tileHeight + 25, 60, 60);
 }
 
 function drawTile(cc, x, y, color) {

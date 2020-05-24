@@ -5,7 +5,7 @@ class GameMaster {
         this.players = players;
         this.currentPlayer = 1;
         this.playerStates = new Array(players + 1);
-        this.pseudoRnd = Math.PI;
+        this.rndState = 42; // random seed
         for (var pi = 0; pi <= players; pi++) {
             this.playerStates[pi] = new PlayerState();
             this.playerStates[pi].tiles = this.countTiles(pi) - this.countUnits(pi, Units.Tree);
@@ -16,8 +16,27 @@ class GameMaster {
     }
 
     nextRnd() {
-        this.pseudoRnd = (this.pseudoRnd * Math.E) % 1.0;
-        return this.pseudoRnd;
+        // xorshift32 algorithm
+        var a = this.rndState;
+        a ^= a << 13;
+        a ^= a >> 17;
+        a ^= a << 5;
+        this.rndState = a;
+        return a;
+    }
+
+    rndTest() {
+        var data = new Array(100);
+        for (var i = 0; i < 100; i++) {
+            data[i] = 0;
+        }
+        for (var i = 0; i < 100000; i++) {
+            var r = this.nextRnd();
+            data[r % 100]++;
+        }
+        for (var i = 0; i < 100; i++) {
+            console.log(i, data[i]);
+        }
     }
 
     countTiles(player) {
@@ -102,7 +121,8 @@ class GameMaster {
         var goalPlayer = this.level.tileMap[tox][toy];
         var thisUnit = this.level.unitMap[fromx][fromy];
         var goalUnit = this.level.unitMap[tox][toy];
-        var to = {"x":tox,"y":toy};
+        var to = { "x": tox, "y": toy };
+
         // cutting a tree
         if (goalUnit == Units.Tree) {
             state.money += GamePlayConstants.cutTreeBonus;
@@ -110,7 +130,7 @@ class GameMaster {
             this.level.unitMap[tox][toy] = null;
             animation.addAnimation(new Animation(AnimationType.FadeOut,
                 to, to, Units.Tree, thisUnit, 1000));
-    
+
         }
         // entering foreign territory
         if (goalPlayer != player) {
@@ -144,14 +164,16 @@ class GameMaster {
                 // a territory without a town, all units die
                 for (let r of reachables) {
                     this.level.tileMap[r.x][r.y] = 0;
-                    this.playerStates[goalPlayer].tiles--;
-
                     var unitToDie = this.level.unitMap[r.x][r.y];
+                    if (unitToDie != Units.Tree) {
+                        this.playerStates[goalPlayer].tiles--;
+                    }
+
                     if (unitToDie != null && unitToDie != Units.Tree) {
                         this.level.unitMap[r.x][r.y] = null;
                         this.playerStates[goalPlayer].unitCount[unitToDie]--;
                         animation.addAnimation(new Animation(AnimationType.FadeOut,
-                            r, r, unitToDie, null, 1000));
+                            { "x": r.x, "y": r.y }, { "x": r.x, "y": r.y }, unitToDie, null, 1000));
                     }
                 }
             }
@@ -163,18 +185,15 @@ class GameMaster {
             state.unitCount[thisUnit]--;
             state.unitCount[mergedUnit]++;
             animation.addAnimation(new Animation(AnimationType.Move,
-                {"x":fromx,"y":fromy}, {"x":tox,"y":toy}, thisUnit, mergedUnit, 1000));
+                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, mergedUnit, 1000));
         } else {
             // moving unit
             animation.addAnimation(new Animation(AnimationType.Move,
-                {"x":fromx,"y":fromy}, {"x":tox,"y":toy}, thisUnit, thisUnit, 1000));
+                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, thisUnit, 1000));
         }
         this.level.tileMap[tox][toy] = player;
         this.level.unitMap[fromx][fromy] = null;
         state.moves--;
-        if (state.moves == 0) {
-            this.endTurn(this.currentPlayer);
-        }
     }
 
     canAfford(unit) {
@@ -197,9 +216,6 @@ class GameMaster {
             state.unitCount[unit]++;
             state.moves--;
             state.money -= GamePlayConstants.cost[unit];
-            if (state.moves == 0) {
-                this.endTurn(this.currentPlayer);
-            }
         } else {
             console.error("Invalid build");
         }
@@ -216,9 +232,12 @@ class GameMaster {
         this.currentPlayer = this.currentPlayer + 1;
         if (this.currentPlayer > this.players) {
             //end of global turn
-            this.growTrees();
             this.currentPlayer = 1;
         }
+        if (this.playerStates[this.currentPlayer].unitCount[Units.Town] == 0) {
+            return this.endTurn(this.currentPlayer);
+        }
+        this.growTrees();
         return this.currentPlayer;
     }
 
@@ -228,6 +247,8 @@ class GameMaster {
         for (var x = 0; x < this.level.level_width; x++) {
             for (var y = 0; y < this.level.level_heigth; y++) {
                 if (tiles[x][y] == player && canMove(units[x][y])) {
+                    animation.addAnimation(new Animation(AnimationType.FadeOut,
+                        { "x": x, "y": y }, { "x": x, "y": y }, units[x][y], null, 1000));
                     units[x][y] = null;
                 }
             }
@@ -236,31 +257,38 @@ class GameMaster {
         this.playerStates[player].unitCount[Units.Swordsman] = 0;
         this.playerStates[player].unitCount[Units.Spearman] = 0;
         this.playerStates[player].unitCount[Units.Knight] = 0;
-        this.playerStates[player].money = 10;
+        this.playerStates[player].money = 0;
     }
 
     growTrees() {
         var tiles = this.level.tileMap;
         var units = this.level.unitMap;
+        var treesToAdd = new Set();
         for (var x = 0; x < this.level.level_width; x++) {
             for (var y = 0; y < this.level.level_heigth; y++) {
                 if (tiles[x][y] == null) {
                     continue;
                 }
-                var rnd = this.nextRnd();
+                var rnd = (Math.abs(this.nextRnd()) % 1000) / 1000.0;
                 // possibly spawn a tree from a tree
-                if (units[x][y] == Units.Tree && rnd < GamePlayConstants.treeReproduceProbability) {
+                if (units[x][y] == Units.Tree && rnd <= GamePlayConstants.treeReproduceProbability) {
                     for (let neigh of getNeighbouringHexas(x, y)) {
-                        if (!this.level.outOfBounds(neigh.x, neigh.y)
-                            && tiles[neigh.x][neigh.y] != null
-                            && units[neigh.x][neigh.y] == null) {
-                            this.addTree(neigh.x, neigh.y);
-                            break;
+                        var nx = neigh.x;
+                        var ny = neigh.y;
+                        if (!this.level.outOfBounds(nx, ny)
+                            && tiles[nx][ny] != null
+                            && units[nx][ny] == null) {
+                            if (!treesToAdd.has(nx + ":" + ny)) {
+                                treesToAdd.add(nx + ":" + my);
+                                this.addTree(nx, ny);
+                                break;
+                            }
                         }
                     }
                 }
                 // possibly spawn a tree from nothing
-                if (units[x][y] == null && rnd < GamePlayConstants.treeSpawnProbability) {
+                if (units[x][y] == null && rnd <= GamePlayConstants.treeSpawnProbability
+                    && !treesToAdd.has(x + ":" + y)) {
                     this.addTree(x, y);
                 }
             }
@@ -269,7 +297,7 @@ class GameMaster {
 
     addTree(x, y) {
         var tiles = this.level.tileMap;
-        var to = {"x":x,"y":y};
+        var to = { "x": x, "y": y };
         animation.addAnimation(new Animation(AnimationType.FadeIn,
             to, to, Units.Tree, Units.Tree, 1000));
 

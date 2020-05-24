@@ -64,8 +64,9 @@ class Level {
         // draw units
         for (var i = 0; i < this.level_width; i++) {
             for (var j = 0; j < this.level_heigth; j++) {
-                if (this.unitMap[i][j] != null) {
-                    drawImage(context, unitImages[this.unitMap[i][j]], i, j);
+                var unit = this.unitMap[i][j];
+                if (unit != null && unit != Units.Reserved) {
+                    drawImage(context, unitImages[unit], i, j);
                 }
             }
         }

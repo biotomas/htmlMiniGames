@@ -48,6 +48,14 @@ function drawHud(cc) {
             cc.font = "bold 15px Arial";
         }
         cc.fillText(playerNames[playerIndex], hudx + 5 + playerIndex * hudPerPlayer, hudy + 15);
+        if (gameMaster.playerStates[playerIndex].unitCount[Units.Town] == 0) {
+            cc.lineWidth = "1";
+            cc.strokeStyle = "black";
+            cc.beginPath();
+            cc.moveTo(hudx + playerIndex * hudPerPlayer, hudy + 10);
+            cc.lineTo(hudx - 5 + (playerIndex + 1) * hudPerPlayer, hudy + 10);
+            cc.stroke();
+        }
         cc.font = "15px Arial";
         var income = gameMaster.playerStates[playerIndex].getIncome();
         if (income > 0) {
