@@ -7,6 +7,11 @@ function syncSend(message) {
     return ajaxRequest.responseText;
 }
 
+function hostNewGame() {
+    var gameId = syncSend("op=host");
+    return gameId;
+}
+
 function getMoves(gameId, step) {
     var moves = JSON.parse(syncSend("op=get&gid=" + gameId + "&step=" + step));
     var result = new Array();
