@@ -68,7 +68,8 @@ if ($op == 'move') {
 } else if ($op == 'join') {
 	$gid = $_POST['gid'];
 	//$sql = "start transaction; select @player:=max(players)+1 from lobby where gameId = '{$gid}'; update lobby set players=@player where gameId = '{$gid}'; commit;";
-	$sql = "update lobby set players = players + 1 OUTPUT Inserted.players where gameId = '{$gid}'";
+	$sql = "start transaction; select players from lobby where gameId = '{$gid}' for update; 
+		update lobby set players = players + 1 where gameId = '{$gid}' select players from lobby where gameId = '{$gid}'; commit;";
 	//$sql = "select * from lobby";
 	$result = $conn->query($sql);
 	echo $conn->error;
