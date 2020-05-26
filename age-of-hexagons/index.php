@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <h1>Yet Another Hexagonal Tactical Game</h1>
+    <h1>Battle for Hexagon Isle</h1>
     <?php 
     $gid = $_GET["gid"];
     if (!$gid) {
