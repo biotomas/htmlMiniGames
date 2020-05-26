@@ -12,6 +12,19 @@ function hostNewGame() {
     return gameId;
 }
 
+function joinGame(gameId) {
+    var playerId = syncSend("op=join&gid=" + gameId);
+    return playerId;
+}
+
+function setName(gameId, nameId, name) {
+    syncSend("op=setLobby&gid=" + gameId + "&col=name" + nameId + "&val='" + name + "'");
+}
+
+function getLobbyData(gameId) {
+    return JSON.parse(syncSend("op=getLobby&gid=" + gameId));
+}
+
 function getMoves(gameId, step) {
     var moves = JSON.parse(syncSend("op=get&gid=" + gameId + "&step=" + step));
     var result = new Array();
@@ -19,27 +32,31 @@ function getMoves(gameId, step) {
         var parts = move.move.split(";");
         var op = parts[0];
         if (op == "go") {
-            result.push({"op":op,"fx":parseInt(parts[1]),
-            "fy":parseInt(parts[2]),"tx":parseInt(parts[3]),"ty":parseInt(parts[4])});
+            result.push({
+                "op": op, "fx": parseInt(parts[1]),
+                "fy": parseInt(parts[2]), "tx": parseInt(parts[3]), "ty": parseInt(parts[4])
+            });
         }
         if (op == "build") {
-            result.push({"op":op,"what":parseInt(parts[1]),
-            "tx":parseInt(parts[2]),"ty":parseInt(parts[3])});
+            result.push({
+                "op": op, "what": parseInt(parts[1]),
+                "tx": parseInt(parts[2]), "ty": parseInt(parts[3])
+            });
         }
         if (op == "endTurn") {
-            result.push({"op":op});
+            result.push({ "op": op });
         }
     }
     return result;
 }
 
 function sendMove(gameId, step, fromx, fromy, tox, toy) {
-    var move = "go;"+fromx+";"+fromy+";"+tox+";"+toy;
+    var move = "go;" + fromx + ";" + fromy + ";" + tox + ";" + toy;
     syncSend("op=move&gid=" + gameId + "&step=" + step + "&move=" + move);
 }
 
 function sendBuild(gameId, step, what, tox, toy) {
-    var move = "build;"+what+";"+tox+";"+toy;
+    var move = "build;" + what + ";" + tox + ";" + toy;
     syncSend("op=move&gid=" + gameId + "&step=" + step + "&move=" + move);
 }
 

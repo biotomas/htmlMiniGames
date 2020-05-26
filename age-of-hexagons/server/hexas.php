@@ -67,23 +67,25 @@ if ($op == 'move') {
 	echo json_encode($moves);
 } else if ($op == 'join') {
 	$gid = $_POST['gid'];
-	//$sql = "start transaction; select @player:=max(players)+1 from lobby where gameId = '{$gid}'; update lobby set players=@player where gameId = '{$gid}'; commit;";
-	$sql = "start transaction; select players from lobby where gameId = '{$gid}' for update; 
-		update lobby set players = players + 1 where gameId = '{$gid}' select players from lobby where gameId = '{$gid}'; commit;";
-	//$sql = "select * from lobby";
-	$result = $conn->query($sql);
-	echo $conn->error;
-	print_r($result);
-	//print_r($result->fetch_assoc());
-	//echo "finished querry " . $result;
-	//print_r($result->fetch_assoc());
-} else if ($op == 'set') {
+	$result = $conn->query("start transaction");
+	$result = $conn->query("update lobby set players = players + 1 where gameId = '{$gid}'");
+	$result = $conn->query("select players from lobby where gameId ='{$gid}'");
+	$players = $result->fetch_assoc()['players'];
+	$result = $conn->query("commit");
+	echo $players;
+} else if ($op == 'setLobby') {
 	$gid = $_POST['gid'];
 	$col = $_POST['col'];
 	$val = $_POST['val'];
-	$sql = "update lobby set '{$col}' = '{$val}' where gameId = '{$gid}'";
+	$sql = "update lobby set {$col}={$val} where gameId = {$gid}";
+	echo $sql;
 	$result = $conn->query($sql);
-	echo $result->fetch_assoc();
+	echo $result;
+} else if ($op == 'getLobby') {
+	$gid = $_POST['gid'];
+	$sql = "select * from lobby where gameId = '{$gid}'";
+	$result = $conn->query($sql);
+	echo json_encode($result->fetch_assoc());	
 } else if ($op == 'get') {
 	$gid = $_POST['gid'];
 	$step = $_POST['step'];
