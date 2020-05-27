@@ -12,7 +12,7 @@ function hostNewGame() {
     return gameId;
 }
 
-function joinGame(gameId) {
+function joinTheGame(gameId) {
     var playerId = syncSend("op=join&gid=" + gameId);
     return playerId;
 }

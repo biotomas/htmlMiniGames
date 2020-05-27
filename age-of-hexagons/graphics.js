@@ -5,14 +5,14 @@ var graphicConstants = {
 
 var playerColors = [
     "#aaaaaa",
-    "#e6beff",
-    "#ffd8b1",
-    "#fffac8",
     "#aaffc3",
     "#42d4f4",
     "#bfef45",
+    "#e6beff",
     "#469990",
     "#e6a9aB",
+    "#ffd8b1",
+    "#fffac8",
 ]
 
 // global graphics offsets (used for scrolling the map)
