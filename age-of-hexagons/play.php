@@ -35,7 +35,7 @@
 playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
 <?php
     echo "gameId = " . $_POST['gid'] .";";
-    echo "mapId = " . $_POST['mapId'] .";";
+    echo "mapId = " . $_POST['level'] .";";
     echo "players = " . $_POST['players'] .";";
     echo "localPlayer = " . $_POST['playerId'] .";";
     echo "playerNames[1] = '" . $_POST['pl1'] ."';";
@@ -69,7 +69,8 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
             c.width = window.innerWidth - 100;
             c.height = window.innerHeight - 100;
             cc = c.getContext('2d');
-            setInterval(update, 1000 / 10);
+            setInterval(update, 1000 / 60);
+            netUpdate();
         }
 
 
@@ -79,6 +80,30 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
         state = States.IDLE;
         gameMaster = new GameMaster(currentLevel, players);
         animation = new AnimationProvider();
+
+        function netUpdate() {
+            if (state != States.ANIMATION && multiPlayerGame) {
+                if (gameMaster.currentPlayer != localPlayer) {
+                    var moves = getMoves(gameId, step);
+                    for (let move of moves) {
+                        if (move.op == "go") {
+                            gameMaster.moveUnit(gameMaster.currentPlayer,
+                                move.fx, move.fy, move.tx, move.ty, animation);
+                        }
+                        if (move.op == "build") {
+                            gameMaster.buildUnit(gameMaster.currentPlayer,
+                                move.tx, move.ty, move.what);
+                        }
+                        if (move.op == "endTurn") {
+                            gameMaster.endTurn(gameMaster.currentPlayer);
+                        }
+                        step++;
+                        break;
+                    }
+                }
+            }
+            setTimeout(netUpdate, 200);
+        }
 
 
         function update() {
@@ -130,22 +155,6 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
 
             if (state != States.ANIMATION && multiPlayerGame) {
                 if (gameMaster.currentPlayer != localPlayer) {
-                    var moves = getMoves(gameId, step);
-                    for (let move of moves) {
-                        if (move.op == "go") {
-                            gameMaster.moveUnit(gameMaster.currentPlayer,
-                                move.fx, move.fy, move.tx, move.ty, animation);
-                        }
-                        if (move.op == "build") {
-                            gameMaster.buildUnit(gameMaster.currentPlayer,
-                                move.tx, move.ty, move.what);
-                        }
-                        if (move.op == "endTurn") {
-                            gameMaster.endTurn(gameMaster.currentPlayer);
-                        }
-                        step++;
-                        break;
-                    }
                     return;
                 }
             }

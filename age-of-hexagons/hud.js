@@ -4,6 +4,9 @@ hudHeigth = 65;
 hudPerPlayer = 80;
 
 function checkEndTurnPressed() {
+    if (multiPlayerGame && gameMaster.currentPlayer != localPlayer) {
+        return false;
+    }
     //hudx + 5 + playerIndex * hudPerPlayer, hudy + hudHeigth + 5, hudPerPlayer, 20);
     var buttonx = hudx + 5 + gameMaster.currentPlayer * hudPerPlayer;
     var buttony = hudy + hudHeigth + 5;
@@ -33,7 +36,18 @@ function drawHud(cc) {
     cc.fillText("Turns ", hudx + 5, hudy + 60);
 
     for (var playerIndex = 1; playerIndex <= gameMaster.players; playerIndex++) {
-        if (gameMaster.currentPlayer == playerIndex) {
+        cc.beginPath();
+        cc.lineWidth = "1";
+        cc.strokeStyle = playerColors[playerIndex];
+        cc.fillStyle = playerColors[playerIndex];
+        cc.rect(hudx + playerIndex * hudPerPlayer, hudy, hudPerPlayer, hudHeigth);
+        cc.stroke();
+        cc.fill();
+        cc.fillStyle = "black";
+        cc.strokeStyle = "black";
+
+        if (gameMaster.currentPlayer == playerIndex &&
+            (!multiPlayerGame || localPlayer == playerIndex)) {
             // end turn button
             cc.beginPath();
             cc.lineWidth = "1";
@@ -45,7 +59,11 @@ function drawHud(cc) {
             cc.fill();
             cc.fillStyle = "black";
             cc.fillText("End Turn", hudx + 10 + playerIndex * hudPerPlayer, hudy + hudHeigth + 20);
+        }
+        if (gameMaster.currentPlayer == playerIndex) {
             cc.font = "bold 15px Arial";
+        } else {
+            cc.font = "15px Arial";
         }
         cc.fillText(playerNames[playerIndex], hudx + 5 + playerIndex * hudPerPlayer, hudy + 15);
         if (gameMaster.playerStates[playerIndex].unitCount[Units.Town] == 0) {
