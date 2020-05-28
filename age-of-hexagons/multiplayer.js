@@ -17,6 +17,10 @@ function joinTheGame(gameId) {
     return playerId;
 }
 
+function setLevel(gameId, mapId) {
+    syncSend("op=setLobby&gid=" + gameId + "&col=mapId&val=" + mapId);
+}
+
 function setName(gameId, nameId, name) {
     syncSend("op=setLobby&gid=" + gameId + "&col=name" + nameId + "&val='" + name + "'");
 }

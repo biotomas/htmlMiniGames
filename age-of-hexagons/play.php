@@ -24,11 +24,6 @@
 </head>
 
 <body>
-    <?php
-    print_r($_POST);
-    print_r($_GET);
-    die;
-    ?>
     <div style="text-align:center; width:100%; height:100%">
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
@@ -36,7 +31,22 @@
         <form>Player:<input type="text" id="player" onchange="setPlayer()"></form>
     </div>
     <script>
-        //currentLevel = new Level(15,15);
+
+playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
+<?php
+    echo "gameId = " . $_POST['gid'] .";";
+    echo "mapId = " . $_POST['mapId'] .";";
+    echo "players = " . $_POST['players'] .";";
+    echo "localPlayer = " . $_POST['playerId'] .";";
+    echo "playerNames[1] = '" . $_POST['pl1'] ."';";
+    echo "playerNames[2] = '" . $_POST['pl2'] ."';";
+    echo "playerNames[3] = '" . $_POST['pl3'] ."';";
+    echo "playerNames[4] = '" . $_POST['pl4'] ."';";
+    echo "playerNames[5] = '" . $_POST['pl5'] ."';";
+    echo "playerNames[6] = '" . $_POST['pl6'] ."';";
+    echo "playerNames[7] = '" . $_POST['pl7'] ."';";
+    echo "playerNames[8] = '" . $_POST['pl8'] ."';";
+?>
 
         function setPlayer() {
             var p = document.getElementById('player').value;
@@ -50,9 +60,7 @@
         framecount = 0;
 
         // multiplayer data
-        multiPlayerGame = false;
-        localPlayer = null;
-        gameId = 27;
+        multiPlayerGame = true;
         step = 1;
 
         window.onload = function () {
@@ -65,12 +73,11 @@
         }
 
 
-        currentLevel = Object.assign(new Level(1, 1), maps[0]);
-        playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
+        currentLevel = Object.assign(new Level(1, 1), maps[mapId]);
         selectedUnit = null;
         reachableTiles = new Set();
         state = States.IDLE;
-        gameMaster = new GameMaster(currentLevel, 3);
+        gameMaster = new GameMaster(currentLevel, players);
         animation = new AnimationProvider();
 
 
