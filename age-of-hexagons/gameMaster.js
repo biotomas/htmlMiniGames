@@ -6,7 +6,7 @@ class GameMaster {
         this.currentPlayer = 1;
         this.playerStates = new Array(players + 1);
         this.rndState = 42; // random seed
-        for (var pi = 0; pi <= players; pi++) {
+        for (var pi = 0; pi <= 8; pi++) {
             this.playerStates[pi] = new PlayerState();
             this.playerStates[pi].tiles = this.countTiles(pi) - this.countUnits(pi, Units.Tree);
             for (var unit = 1; unit < 8; unit++) {
