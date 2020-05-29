@@ -1,7 +1,8 @@
 
 function syncSend(message) {
-    var ajaxRequest = new XMLHttpRequest();
-    ajaxRequest.open("POST", "http://localhost/hexas/hexas.php", false);
+    var ajaxRequest = new XMLHttpRequest();    
+    ajaxRequest.open("POST", "http://localhost/htmlMiniGames/age-of-hexagons/server/hexas.php", false);
+    //ajaxRequest.open("POST", "http://localhost/hexas/hexas.php", false);
     ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     ajaxRequest.send(message);
     return ajaxRequest.responseText;

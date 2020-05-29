@@ -1,8 +1,12 @@
 
-function resizeArray(arr, newSize, defaultValue) {
-    while (newSize > arr.length)
-        arr.push(defaultValue);
-    arr.length = newSize;
+function resizeArray(arr, newSize, createFunction) {
+    if (newSize > arr.length) {
+        while (newSize > arr.length) {
+            arr.push(createFunction());
+        }
+    } else {
+        arr.length = newSize;
+    }
 }
 
 class Level {
@@ -23,14 +27,14 @@ class Level {
     }
 
     resize(new_width, new_heigth) {
-        resizeArray(this.tileMap, new_width, new Array(new_heigth));
-        resizeArray(this.unitMap, new_width, new Array(new_heigth));
-        for (var i = 0; i < new_width; i++) {
-            resizeArray(this.unitMap[i], new_heigth, null);
-            resizeArray(this.tileMap[i], new_heigth, null);
-        }
         this.level_width = new_width;
         this.level_heigth = new_heigth;
+        resizeArray(this.tileMap, new_width, () => new Array());
+        resizeArray(this.unitMap, new_width, () => new Array());
+        for (var i = 0; i < new_width; i++) {
+            resizeArray(this.unitMap[i], new_heigth, () => null);
+            resizeArray(this.tileMap[i], new_heigth, () => null);
+        }
     }
 
     toJson() {

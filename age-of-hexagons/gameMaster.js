@@ -237,7 +237,7 @@ class GameMaster {
         if (this.playerStates[this.currentPlayer].unitCount[Units.Town] == 0) {
             return this.endTurn(this.currentPlayer);
         }
-        this.growTrees();
+        //this.growTrees();
         return this.currentPlayer;
     }
 
@@ -261,6 +261,8 @@ class GameMaster {
     }
 
     growTrees() {
+        //TODO temporarily deactivated because of problems in multi-player
+        return;
         var tiles = this.level.tileMap;
         var units = this.level.unitMap;
         var treesToAdd = new Set();
