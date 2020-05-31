@@ -2,7 +2,6 @@
 
 In order or priority
 
-1. surrounded (by 4 or more neighbours) hexas turn color (including buildings)
 1. each unit can move once per turn + 2 extra moves
 1. symmetry for level editor
 1. random level generator
