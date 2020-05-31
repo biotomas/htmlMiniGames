@@ -6,6 +6,7 @@ class GameMaster {
         this.currentPlayer = 1;
         this.playerStates = new Array(players + 1);
         this.rndState = 42; // random seed
+        this.movedUnits = new Set();
         for (var pi = 0; pi <= 8; pi++) {
             this.playerStates[pi] = new PlayerState();
             this.playerStates[pi].tiles = this.countTiles(pi) - this.countUnits(pi, Units.Tree);
@@ -196,7 +197,16 @@ class GameMaster {
         }
         this.level.tileMap[tox][toy] = player;
         this.level.unitMap[fromx][fromy] = null;
-        state.moves--;
+        if (!this.canMoveForFree(fromx, fromy)) {
+            state.moves--;
+        }
+        this.movedUnits.delete(fromx + ":" + fromy);
+        this.movedUnits.add(tox + ":" + toy);
+        console.log(this.movedUnits);
+    }
+
+    canMoveForFree(x, y) {
+        return !this.movedUnits.has(x + ":" + y);
     }
 
     checkForSurroundedTiles(player, x, y) {
@@ -256,6 +266,7 @@ class GameMaster {
     }
 
     endTurn(player) {
+        this.movedUnits.clear();
         if (this.currentPlayer != player) {
             console.error("Invalid end of turn");
         }

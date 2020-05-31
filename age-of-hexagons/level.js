@@ -70,7 +70,12 @@ class Level {
             for (var j = 0; j < this.level_heigth; j++) {
                 var unit = this.unitMap[i][j];
                 if (unit != null && unit != Units.Reserved) {
-                    drawImage(context, unitImages[unit], i, j);
+                    if (gameMaster.canMoveForFree(i,j) && canMove(unit)) {
+                        console.log(timeNow%1000);
+                        drawImage(context, unitImages[unit], i, j - 0.2 * ((timeNow % 1000)/1000));
+                    } else {
+                        drawImage(context, unitImages[unit], i, j);
+                    }
                 }
             }
         }

@@ -33,7 +33,7 @@ var GamePlayConstants = {
     tileIncome: 1,
     conquerTileBonus: 2,
     cutTreeBonus: 3,
-    movesPerTurn: 3,
+    movesPerTurn: 2,
     startMoney: 10,
     treeSpawnProbability: 0.01,
     treeReproduceProbability: 0.5,
