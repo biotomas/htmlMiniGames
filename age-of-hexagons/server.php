@@ -1,28 +1,25 @@
 <?php
 
-// $servername = "md51.wedos.net";
-// $username = "w225003_hexas";
-// $password = "jirae44@fe233221FDDW";
-// $dbname = "d225003_hexas";
+$hostname = gethostname();
 
-$servername = "localhost";
-$username = "hexas";
-$password = "hexas";
-$dbname = "hexas";
-
+if ($hostname == "tomas-HP-ProBook-4330s" || $hostname == "TODO-windows-pc-name") {
+	$servername = "localhost";
+	$username = "hexas";
+	$password = "hexas";
+	$dbname = "hexas";
+} else {
+	$servername = "md51.wedos.net";
+	$username = "w225003_hexas";
+	$password = "jirae44@fe233221FDDW";
+	$dbname = "d225003_hexas";
+}
+	
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
-
-// $gid = 548904107;
-// $sql = "start transaction; select @player:=players+1 from lobby where gameId = {$gid}; update lobby set players=@player where gameId = {$gid}; commit;";
-// echo $sql;
-// $result = $conn->query($sql);
-// print_r($result->fetch_assoc());
-
 
 $op = $_POST['op'];
 

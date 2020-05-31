@@ -28,7 +28,7 @@ var GamePlayConstants = {
     defense: [0, 3, 4, 2, 1, 2, 3, 4],
     attack: [0, 0, 0, 0, 1, 2, 3, 4],
     range: [0, 0, 0, 0, 3, 2, 1, 3],
-    incomes: [0, -5, 5, 5, -5, -10, -20, -30],
+    incomes: [0, -5, 5, 5, -5, -10, -20, -40],
     cost: [0, 10, 30, 10, 10, 20, 30, 40],
     tileIncome: 1,
     conquerTileBonus: 2,

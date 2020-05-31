@@ -96,7 +96,7 @@ class GameMaster {
         for (let nb of area) {
             if (!level.outOfBounds(nb.x, nb.y)) {
                 var unit = level.unitMap[nb.x][nb.y];
-                if (level.tileMap[nb.x][nb.y] != player && unit == Units.Tower) {
+                if (level.tileMap[nb.x][nb.y] != player && unit != null) {
                     maxDefense = Math.max(maxDefense, GamePlayConstants.defense[unit]);
                 }
             }

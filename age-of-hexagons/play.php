@@ -2,8 +2,10 @@
 <html>
 
 <head>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
-    <title>Age of Hexagons</title>
+    <title>Battle for Hexagon Isle</title>
     <style type="text/css">
         canvas {
             margin: auto;
@@ -20,7 +22,7 @@
     <script src="gameMaster.js"></script>
     <script src="hud.js"></script>
     <script src="animations.js"></script>
-    <script src="multiplayer.js"></script>
+    <script src="server.js"></script>
 </head>
 
 <body>
@@ -28,40 +30,31 @@
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
         <p>Cursor: <span id="cursor"></span></p>
-        <form>Player:<input type="text" id="player" onchange="setPlayer()"></form>
     </div>
     <script>
 
-playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia"];
+playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
 <?php
-    echo "gameId = " . $_POST['gid'] .";";
-    echo "mapId = " . $_POST['level'] .";";
-    echo "players = " . $_POST['players'] .";";
-    echo "localPlayer = " . $_POST['playerId'] .";";
-    echo "playerNames[1] = '" . $_POST['pl1'] ."';";
-    echo "playerNames[2] = '" . $_POST['pl2'] ."';";
-    echo "playerNames[3] = '" . $_POST['pl3'] ."';";
-    echo "playerNames[4] = '" . $_POST['pl4'] ."';";
-    echo "playerNames[5] = '" . $_POST['pl5'] ."';";
-    echo "playerNames[6] = '" . $_POST['pl6'] ."';";
-    echo "playerNames[7] = '" . $_POST['pl7'] ."';";
-    echo "playerNames[8] = '" . $_POST['pl8'] ."';";
+    if (empty($_POST)) {
+        // for debugging without multiplayer
+        echo "multiPlayerGame = false; mapId = 1; step = 1; players = 2;";
+    } else {
+        echo "multiPlayerGame = true; step = 1; ";
+        echo "server = new MultiplayerServer('" . gethostname() . "');";
+        echo "gameId = " . $_POST['gid'] .";";
+        echo "mapId = " . $_POST['level'] .";";
+        echo "players = " . $_POST['players'] .";";
+        echo "localPlayer = " . $_POST['playerId'] .";";
+        echo "playerNames[1] = '" . $_POST['pl1'] ."';";
+        echo "playerNames[2] = '" . $_POST['pl2'] ."';";
+        echo "playerNames[3] = '" . $_POST['pl3'] ."';";
+        echo "playerNames[4] = '" . $_POST['pl4'] ."';";
+        echo "playerNames[5] = '" . $_POST['pl5'] ."';";
+        echo "playerNames[6] = '" . $_POST['pl6'] ."';";
+        echo "playerNames[7] = '" . $_POST['pl7'] ."';";
+        echo "playerNames[8] = '" . $_POST['pl8'] ."';";
+    }
 ?>
-
-        function setPlayer() {
-            var p = document.getElementById('player').value;
-            localPlayer = p;
-            console.log(p);
-        }
-
-        d = new Date();
-        lastframe = d.getTime();
-        lastkframe = d.getTime();
-        framecount = 0;
-
-        // multiplayer data
-        multiPlayerGame = true;
-        step = 1;
 
         window.onload = function () {
             c = document.getElementById('scene');
@@ -69,8 +62,12 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
             c.width = window.innerWidth - 100;
             c.height = window.innerHeight - 100;
             cc = c.getContext('2d');
-            setInterval(update, 1000 / 60);
-            netUpdate();
+            var fpsLimit = 10;
+            setInterval(update, 1000 / fpsLimit);
+            if (multiPlayerGame) {
+                server.refreshMoves(gameId, step);
+                netUpdate();
+            }
         }
 
 
@@ -84,15 +81,19 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
         function netUpdate() {
             if (state != States.ANIMATION && multiPlayerGame) {
                 if (gameMaster.currentPlayer != localPlayer) {
-                    var moves = getMoves(gameId, step);
+                    if (server.movesData == null) {
+                        setTimeout(netUpdate, 100);
+                        return;
+                    }
+                    var moves = server.movesData;
                     for (let move of moves) {
                         if (move.op == "go") {
                             gameMaster.moveUnit(gameMaster.currentPlayer,
-                                move.fx, move.fy, move.tx, move.ty, animation);
+                            move.fx, move.fy, move.tx, move.ty, animation);
                         }
                         if (move.op == "build") {
                             gameMaster.buildUnit(gameMaster.currentPlayer,
-                                move.tx, move.ty, move.what);
+                            move.tx, move.ty, move.what);
                         }
                         if (move.op == "endTurn") {
                             gameMaster.endTurn(gameMaster.currentPlayer);
@@ -100,9 +101,10 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
                         step++;
                         break;
                     }
+                    server.refreshMoves(gameId, step);
                 }
             }
-            setTimeout(netUpdate, 200);
+            setTimeout(netUpdate, 300);
         }
 
 
@@ -143,7 +145,7 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
             if (checkEndTurnPressed()) {
                 gameMaster.endTurn(gameMaster.currentPlayer);
                 if (multiPlayerGame) {
-                    sendEndTurn(gameId, step);
+                    server.sendEndTurn(gameId, step);
                     step++;
                 }
             }
@@ -163,6 +165,11 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
                 updateBuildMenu();
             }
 
+            if (state != States.ANIMATION && keypressed('rightMouse')) {
+                state = States.IDLE;
+                buildMenuEnabled = false;
+            }
+
             while (!currentLevel.outOfBounds(mx, my)) {
                 if (state == States.BUILD) {
                     cc.globalAlpha = 0.3;
@@ -180,7 +187,7 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
                             gameMaster.buildUnit(gameMaster.currentPlayer,
                                 mx, my, unitToBuild);
                             if (multiPlayerGame) {
-                                sendBuild(gameId, step, unitToBuild, mx, my);
+                                server.sendBuild(gameId, step, unitToBuild, mx, my);
                                 step++;
                             }
                             state = States.IDLE;
@@ -203,7 +210,7 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
                             gameMaster.moveUnit(gameMaster.currentPlayer,
                                 selectedUnit.x, selectedUnit.y, mx, my, animation);
                             if (multiPlayerGame) {
-                                sendMove(gameId, step, selectedUnit.x, selectedUnit.y, mx, my);
+                                server.sendMove(gameId, step, selectedUnit.x, selectedUnit.y, mx, my);
                                 step++;
                             }
                         }
@@ -223,14 +230,15 @@ playerNames = ["nature", "Jessica", "Tomas", "Sebastian", "Marco", "Tim", "Julia
 
         }
 
-        function framerate() {
-            d = new Date();
-            tnow = d.getTime();
-            tfr = tnow - lastframe;
-            lastframe = tnow;
+        d = new Date();
+        lastkframe = d.getTime();
+        framecount = 0;
 
+        function framerate() {
             framecount++;
             if (framecount > 30) {
+                d = new Date();
+                tnow = d.getTime();
                 fps = Math.floor(1000 / ((tnow - lastkframe) / 30));
                 framecount = 0;
                 lastkframe = tnow;
