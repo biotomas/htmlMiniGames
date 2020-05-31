@@ -1,3 +1,7 @@
+<?php
+    require 'common.php';
+?>
+
 <!DOCTYPE HTML>
 <html>
 
@@ -6,8 +10,8 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <title>Battle for Hexagon Isle</title>
-    <script src="server.js"></script>
-    <script src="graphics.js"></script>
+    <script src="server.js?ver=<?=$version?>"></script>
+    <script src="graphics.js?ver=<?=$version?>"></script>
     <style>
     body {
         font-size: 18px;

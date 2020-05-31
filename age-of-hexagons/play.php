@@ -1,4 +1,8 @@
-﻿<!DOCTYPE HTML>
+﻿<?php
+    require 'common.php';
+?>
+
+<!DOCTYPE HTML>
 <html>
 
 <head>
@@ -13,16 +17,16 @@
             border: 1px solid #000;
         }
     </style>
-    <script src="input.js"></script>
-    <script src="level.js"></script>
-    <script src="gameLogic.js"></script>
-    <script src="graphics.js"></script>
-    <script src="maps.js"></script>
-    <script src="buildMenu.js"></script>
-    <script src="gameMaster.js"></script>
-    <script src="hud.js"></script>
-    <script src="animations.js"></script>
-    <script src="server.js"></script>
+    <script src="input.js?ver=<?=$version?>"></script>
+    <script src="level.js?ver=<?=$version?>"></script>
+    <script src="gameLogic.js?ver=<?=$version?>"></script>
+    <script src="graphics.js?ver=<?=$version?>"></script>
+    <script src="maps.js?ver=<?=$version?>"></script>
+    <script src="buildMenu.js?ver=<?=$version?>"></script>
+    <script src="gameMaster.js?ver=<?=$version?>"></script>
+    <script src="hud.js?ver=<?=$version?>"></script>
+    <script src="animations.js?ver=<?=$version?>"></script>
+    <script src="server.js?ver=<?=$version?>"></script>
 </head>
 
 <body>
