@@ -63,6 +63,9 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             c.height = window.innerHeight - 100;
             cc = c.getContext('2d');
             var fpsLimit = 10;
+            if (typeof server !== 'undefined') {
+                fpsLimit = server.maxFps;
+            }
             setInterval(update, 1000 / fpsLimit);
             if (multiPlayerGame) {
                 server.refreshMoves(gameId, step);

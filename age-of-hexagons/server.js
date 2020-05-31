@@ -4,12 +4,15 @@ class MultiplayerServer {
     constructor(serverName) {
         if (serverName == "tomas-HP-ProBook-4330s") {
             // my linux laptop
+            this.maxFps = 10;
             this.serverUrl = "http://localhost/aoh/server.php";
         } else if (serverName == "TODO") {
             // my windows laptop
+            this.maxFps = 60;
             this.serverUrl = "http://localhost/htmlMiniGames/age-of-hexagons/server.php";
         } else {
             // freelunch.eu
+            this.maxFps = 60;
             this.serverUrl = "http://freelunch.eu/age-of-hexagons/server.php";
         }
     }
@@ -69,7 +72,6 @@ class MultiplayerServer {
         this.movesData = null;
         this.asyncSendCallback("op=get&gid=" + gameId + "&step=" + step,
             x => this.translateMoves(x));
-        console.log("refresh moves called");
     }
 
     translateMoves(response) {
