@@ -70,7 +70,16 @@ class Level {
             for (var j = 0; j < this.level_heigth; j++) {
                 var unit = this.unitMap[i][j];
                 if (unit != null && unit != Units.Reserved) {
-                    drawImage(context, unitImages[unit], i, j);
+                    if (canMove(unit)) {
+                        var which = (Math.round(timeNow/100)) % 10;
+                        if (which > 5) {
+                            which = 10 - which;
+                        }
+                        drawImage(context, animationImgs[unit][which+1], i, j);
+                        //drawImage(context, unitImages[unit], i, j);
+                    } else {
+                        drawImage(context, unitImages[unit], i, j);
+                    }
                 }
             }
         }
