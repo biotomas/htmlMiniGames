@@ -31,6 +31,20 @@ swordsmanImg = loadImage('assets/swordsman.png');
 knightImg = loadImage('assets/knight.png');
 disabledImg = loadImage('assets/disabled.png');
 
+
+animationImgs = {};
+animationImgs[Units.Peasant] = {};
+animationImgs[Units.Spearman] = {};
+animationImgs[Units.Swordsman] = {};
+animationImgs[Units.Knight] = {};
+
+for (var i = 1; i <= 6; i++) {
+    animationImgs[Units.Peasant][i] = loadImage('assets/peasant' + (i > 1 ? i : '') + '.png');
+    animationImgs[Units.Spearman][i] = loadImage('assets/spearman' + (i > 1 ? i : '') + '.png');
+    animationImgs[Units.Swordsman][i] = loadImage('assets/swordsman' + (i > 1 ? i : '') + '.png');
+    animationImgs[Units.Knight][i] = loadImage('assets/knight' + (i > 1 ? i : '') + '.png');
+}
+
 // See gameLogic.units for ordering
 var unitImages = [treeImg, towerImg, townImg, farmImg, peasantImg, spearmanImg, swordsmanImg, knightImg];
 

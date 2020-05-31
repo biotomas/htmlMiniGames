@@ -69,10 +69,15 @@ class Level {
         for (var i = 0; i < this.level_width; i++) {
             for (var j = 0; j < this.level_heigth; j++) {
                 var unit = this.unitMap[i][j];
+                var nation = this.tileMap[i][j]
                 if (unit != null && unit != Units.Reserved) {
-                    if (gameMaster.canMoveForFree(i,j) && canMove(unit)) {
-                        console.log(timeNow%1000);
-                        drawImage(context, unitImages[unit], i, j - 0.2 * ((timeNow % 1000)/1000));
+                    if (gameMaster.canMoveForFree(i, j) && canMove(unit)
+                        && gameMaster.currentPlayer == nation) {
+                        var which = (Math.round(timeNow / 100)) % 10;
+                        if (which > 5) {
+                            which = 10 - which;
+                        }
+                        drawImage(context, animationImgs[unit][which + 1], i, j);
                     } else {
                         drawImage(context, unitImages[unit], i, j);
                     }
