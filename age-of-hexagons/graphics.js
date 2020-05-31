@@ -64,17 +64,21 @@ function drawBackground(cc, time) {
 }
 
 function scrollCanvas() {
-    if (keyState[65]) {
+    if (keyIsDown(65)) {
         globalxoff += 5;
     }
-    if (keyState[68]) {
+    if (keyIsDown(68)) {
         globalxoff -= 5;
     }
-    if (keyState[87]) {
+    if (keyIsDown(87)) {
         globalyoff += 5;
     }
-    if (keyState[83]) {
+    if (keyIsDown(83)) {
         globalyoff -= 5;
+    }
+    if (keypressed(82)) {
+        globalxoff = 0;
+        globalyoff = 0;
     }
 }
 

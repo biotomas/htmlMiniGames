@@ -96,7 +96,7 @@ class GameMaster {
         for (let nb of area) {
             if (!level.outOfBounds(nb.x, nb.y)) {
                 var unit = level.unitMap[nb.x][nb.y];
-                if (level.tileMap[nb.x][nb.y] != player && unit == Units.Tower) {
+                if (level.tileMap[nb.x][nb.y] != player && unit != null) {
                     maxDefense = Math.max(maxDefense, GamePlayConstants.defense[unit]);
                 }
             }
@@ -122,7 +122,10 @@ class GameMaster {
         var thisUnit = this.level.unitMap[fromx][fromy];
         var goalUnit = this.level.unitMap[tox][toy];
         var to = { "x": tox, "y": toy };
+        this.level.tileMap[tox][toy] = player;
 
+        // conquering by surrounding tiles
+        this.checkForSurroundedTiles(player, tox, toy);
         // cutting a tree
         if (goalUnit == Units.Tree) {
             state.money += GamePlayConstants.cutTreeBonus;
@@ -194,6 +197,37 @@ class GameMaster {
         this.level.tileMap[tox][toy] = player;
         this.level.unitMap[fromx][fromy] = null;
         state.moves--;
+    }
+
+    checkForSurroundedTiles(player, x, y) {
+        for (let n of getNeighbourTiles(this.level, x, y)) {
+            var owner = this.level.tileMap[n.x][n.y];
+            if (owner == player) {
+                continue;
+            }
+            if (this.countSurrounding(player, n.x, n.y) > 3) {
+                this.playerStates[player].tiles++;
+                this.playerStates[owner].tiles--;
+                this.level.tileMap[n.x][n.y] = player;
+                var unit = this.level.unitMap[n.x][n.y];
+                if (unit > 0) {
+                    this.playerStates[player].unitCount[unit]++;
+                    this.playerStates[owner].unitCount[unit]--;
+                }
+                //this.checkForSurroundedTiles(player, n.x, n.y);
+            }
+        }
+    }
+
+    countSurrounding(player, x, y) {
+        var surrounds = 0;
+        for (let n of getNeighbourTiles(this.level, x, y)) {
+            var owner = this.level.tileMap[n.x][n.y];
+            if (owner == player) {
+                surrounds++;
+            }
+        }
+        return surrounds;
     }
 
     canAfford(unit) {

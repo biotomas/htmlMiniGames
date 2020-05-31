@@ -30,7 +30,6 @@ function updateBuildMenu() {
         }
         if (keypressed('leftMouse') && (buildMenuEditorMode || gameMaster.canAfford(buildUnit))) {
             state = States.BUILD;
-            console.log("selected unit");
             unitToBuild = buildUnit;
             buildMenuEnabled = buildMenuEditorMode;
         }
