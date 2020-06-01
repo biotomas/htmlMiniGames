@@ -13,6 +13,7 @@ class GameMaster {
             for (var unit = 1; unit < 8; unit++) {
                 this.playerStates[pi].unitCount[unit] = this.countUnits(pi, unit);
             }
+            this.playerStates[pi].unitMoves = this.playerStates[pi].countMovingUnits();
         }
     }
 
@@ -123,9 +124,10 @@ class GameMaster {
         var thisUnit = this.level.unitMap[fromx][fromy];
         var goalUnit = this.level.unitMap[tox][toy];
         var to = { "x": tox, "y": toy };
-        this.level.tileMap[tox][toy] = player;
 
-        // conquering by surrounding tiles
+        this.level.tileMap[tox][toy] = player;
+        // conquering by surrounding tiles, must be done twice
+        this.checkForSurroundedTiles(player, tox, toy);
         this.checkForSurroundedTiles(player, tox, toy);
         // cutting a tree
         if (goalUnit == Units.Tree) {
@@ -136,51 +138,8 @@ class GameMaster {
                 to, to, Units.Tree, thisUnit, 1000));
 
         }
-        // entering foreign territory
         if (goalPlayer != player) {
-            this.level.tileMap[tox][toy] = player;
-            state.tiles++;
-            state.money += GamePlayConstants.conquerTileBonus;
-            this.playerStates[goalPlayer].tiles--;
-            // killing/destroying enemy unit
-            if (goalUnit != null && goalPlayer > 0) {
-                this.playerStates[goalPlayer].unitCount[goalUnit]--;
-                this.level.unitMap[tox][toy] = null;
-                animation.addAnimation(new Animation(AnimationType.FadeOut,
-                    to, to, goalUnit, null, 1000));
-            }
-            for (let n of getNeighbourTiles(this.level, tox, toy)) {
-                var owner = this.level.tileMap[n.x][n.y];
-                if (owner == 0 || owner == player) {
-                    continue;
-                }
-                var reachables = allRaeachableWithinNation(this.level, n.x, n.y);
-                var townFound = false;
-                for (let r of reachables) {
-                    if (this.level.unitMap[r.x][r.y] == Units.Town) {
-                        townFound = true;
-                        break;
-                    }
-                }
-                if (townFound) {
-                    continue;
-                }
-                // a territory without a town, all units die
-                for (let r of reachables) {
-                    this.level.tileMap[r.x][r.y] = 0;
-                    var unitToDie = this.level.unitMap[r.x][r.y];
-                    if (unitToDie != Units.Tree) {
-                        this.playerStates[goalPlayer].tiles--;
-                    }
-
-                    if (unitToDie != null && unitToDie != Units.Tree) {
-                        this.level.unitMap[r.x][r.y] = null;
-                        this.playerStates[goalPlayer].unitCount[unitToDie]--;
-                        animation.addAnimation(new Animation(AnimationType.FadeOut,
-                            { "x": r.x, "y": r.y }, { "x": r.x, "y": r.y }, unitToDie, null, 1000));
-                    }
-                }
-            }
+            this.takeTerritory(tox, toy, goalPlayer, player, true);
         }
         // merging units
         if (goalPlayer == player && canMove(goalUnit)) {
@@ -192,17 +151,86 @@ class GameMaster {
                 { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, mergedUnit, 1000));
         } else {
             // moving unit
+            this.movedUnits.add(tox + ":" + toy);
             animation.addAnimation(new Animation(AnimationType.Move,
                 { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, thisUnit, 1000));
         }
-        this.level.tileMap[tox][toy] = player;
-        this.level.unitMap[fromx][fromy] = null;
-        if (!this.canMoveForFree(fromx, fromy)) {
+        if (this.canMoveForFree(fromx, fromy)) {
+            state.unitMoves--;
+        } else {
             state.moves--;
         }
+        this.level.unitMap[fromx][fromy] = null;
         this.movedUnits.delete(fromx + ":" + fromy);
-        this.movedUnits.add(tox + ":" + toy);
         console.log(this.movedUnits);
+    }
+
+    takeTerritory(x, y, oldOwner, newOwner, kill) {
+        console.log("take territory", x, y, oldOwner, newOwner);
+        var state = this.playerStates[newOwner];
+        var enemyState = this.playerStates[oldOwner];
+        var enemyUnit = this.level.unitMap[x][y];
+        this.level.tileMap[x][y] = newOwner;
+        state.tiles++;
+        enemyState.tiles--;
+        state.money += GamePlayConstants.conquerTileBonus;
+        // killing/destroying enemy unit
+        if (enemyUnit != null && oldOwner > 0) {
+            if (kill) {
+                this.killUnit(x, y, oldOwner);
+            } else {
+                this.convertUnit(enemyUnit, oldOwner, newOwner);
+            }
+        }
+        for (let n of getNeighbourTiles(this.level, x, y)) {
+            var owner = this.level.tileMap[n.x][n.y];
+            if (owner == 0 || owner == newOwner) {
+                continue;
+            }
+            var reachables = allRaeachableWithinNation(this.level, n.x, n.y);
+            var townFound = false;
+            for (let r of reachables) {
+                if (this.level.unitMap[r.x][r.y] == Units.Town) {
+                    townFound = true;
+                    break;
+                }
+            }
+            if (townFound) {
+                continue;
+            }
+            // a territory without a town, all units die
+            for (let r of reachables) {
+                this.level.tileMap[r.x][r.y] = 0;
+                var unitToDie = this.level.unitMap[r.x][r.y];
+                if (unitToDie != Units.Tree) {
+                    this.playerStates[owner].tiles--;
+                }
+                if (unitToDie != null && unitToDie != Units.Tree) {
+                    this.killUnit(r.x, r.y, owner);
+                }
+            }
+        }
+    }
+
+    convertUnit(unit, oldOwner, newOwner) {
+        this.playerStates[newOwner].unitCount[unit]++;
+        this.playerStates[oldOwner].unitCount[unit]--;
+        if (canMove(unit)) {
+            this.playerStates[newOwner].unitMoves++;
+            this.playerStates[oldOwner].unitMoves--;
+        }
+    }
+
+    killUnit(x, y, owner) {
+        var unit = this.level.unitMap[x][y];
+        this.level.unitMap[x][y] = null;
+        this.playerStates[owner].unitCount[unit]--;
+        if (canMove(unit)) {
+            this.playerStates[owner].unitMoves--;
+        }
+        animation.addAnimation(new Animation(AnimationType.FadeOut,
+            { "x": x, "y": y }, { "x": x, "y": y }, unit, null, 1000));
+
     }
 
     canMoveForFree(x, y) {
@@ -215,29 +243,25 @@ class GameMaster {
             if (owner == player) {
                 continue;
             }
-            if (this.countSurrounding(player, n.x, n.y) > 3) {
-                this.playerStates[player].tiles++;
-                this.playerStates[owner].tiles--;
-                this.level.tileMap[n.x][n.y] = player;
-                var unit = this.level.unitMap[n.x][n.y];
-                if (unit > 0) {
-                    this.playerStates[player].unitCount[unit]++;
-                    this.playerStates[owner].unitCount[unit]--;
-                }
-                //this.checkForSurroundedTiles(player, n.x, n.y);
+            if (this.isSurrounded(player, n.x, n.y)) {
+                this.takeTerritory(n.x, n.y, owner, player, false);
             }
         }
     }
 
-    countSurrounding(player, x, y) {
+    isSurrounded(player, x, y) {
         var surrounds = 0;
+        var land = 0;
         for (let n of getNeighbourTiles(this.level, x, y)) {
             var owner = this.level.tileMap[n.x][n.y];
+            if (owner != null) {
+                land++;
+            }
             if (owner == player) {
                 surrounds++;
             }
         }
-        return surrounds;
+        return surrounds > land / 2;
     }
 
     canAfford(unit) {
@@ -260,6 +284,9 @@ class GameMaster {
             state.unitCount[unit]++;
             state.moves--;
             state.money -= GamePlayConstants.cost[unit];
+            if (canMove(unit)) {
+                state.unitMoves++;
+            }
         } else {
             console.error("Invalid build");
         }
@@ -292,16 +319,10 @@ class GameMaster {
         for (var x = 0; x < this.level.level_width; x++) {
             for (var y = 0; y < this.level.level_heigth; y++) {
                 if (tiles[x][y] == player && canMove(units[x][y])) {
-                    animation.addAnimation(new Animation(AnimationType.FadeOut,
-                        { "x": x, "y": y }, { "x": x, "y": y }, units[x][y], null, 1000));
-                    units[x][y] = null;
+                    this.killUnit(x, y, player);
                 }
             }
         }
-        this.playerStates[player].unitCount[Units.Peasant] = 0;
-        this.playerStates[player].unitCount[Units.Swordsman] = 0;
-        this.playerStates[player].unitCount[Units.Spearman] = 0;
-        this.playerStates[player].unitCount[Units.Knight] = 0;
         this.playerStates[player].money = 0;
     }
 

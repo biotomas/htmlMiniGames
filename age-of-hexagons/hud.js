@@ -33,7 +33,7 @@ function drawHud(cc) {
     cc.fillText("Player", hudx + 5, hudy + 15);
     cc.fillText("Income ", hudx + 5, hudy + 30);
     cc.fillText("Money ", hudx + 5, hudy + 45);
-    cc.fillText("Turns ", hudx + 5, hudy + 60);
+    cc.fillText("Actions ", hudx + 5, hudy + 60);
 
     for (var playerIndex = 1; playerIndex <= gameMaster.players; playerIndex++) {
         cc.beginPath();
@@ -75,7 +75,8 @@ function drawHud(cc) {
             cc.stroke();
         }
         cc.font = "15px Arial";
-        var income = gameMaster.playerStates[playerIndex].getIncome();
+        var state = gameMaster.playerStates[playerIndex];
+        var income = state.getIncome();
         if (income > 0) {
             cc.fillStyle = "green";
             income = "+" + income;
@@ -84,8 +85,8 @@ function drawHud(cc) {
         }
         cc.fillText(income, hudx + 5 + playerIndex * hudPerPlayer, hudy + 30);
         cc.fillStyle = "black";
-        cc.fillText(gameMaster.playerStates[playerIndex].money, hudx + 5 + playerIndex * hudPerPlayer, hudy + 45);
-        cc.fillText(gameMaster.playerStates[playerIndex].moves, hudx + 5 + playerIndex * hudPerPlayer, hudy + 60);
+        cc.fillText(state.money, hudx + 5 + playerIndex * hudPerPlayer, hudy + 45);
+        cc.fillText(state.unitMoves + "+" + state.moves, hudx + 5 + playerIndex * hudPerPlayer, hudy + 60);
 
     }
 

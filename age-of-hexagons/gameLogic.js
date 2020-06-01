@@ -34,7 +34,7 @@ var GamePlayConstants = {
     conquerTileBonus: 2,
     cutTreeBonus: 3,
     movesPerTurn: 2,
-    startMoney: 10,
+    startMoney: 100,
     treeSpawnProbability: 0.01,
     treeReproduceProbability: 0.5,
 }
@@ -170,11 +170,21 @@ class PlayerState {
         this.moves = GamePlayConstants.movesPerTurn;
         this.tiles = 0;
         this.unitCount = [0, 0, 0, 0, 0, 0, 0, 0];
+        this.unitMoves = 0;
+    }
+
+    countMovingUnits() {
+        var total = 0;
+        for (var i = Units.Peasant; i <= Units.Knight; i++) {
+            total += this.unitCount[i];
+        }
+        return total;
     }
 
     endTurn() {
         this.money += this.getIncome();
         this.moves = GamePlayConstants.movesPerTurn;
+        this.unitMoves = this.countMovingUnits();
     }
 
     getIncome() {
