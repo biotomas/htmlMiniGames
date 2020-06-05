@@ -2,7 +2,7 @@
 
 $hostname = gethostname();
 
-if ($hostname == "tomas-HP-ProBook-4330s" || $hostname == "TODO-windows-pc-name") {
+if ($hostname == "tomas-HP-ProBook-4330s" || $hostname == "CAS-N03923") {
 	$servername = "localhost";
 	$username = "hexas";
 	$password = "hexas";

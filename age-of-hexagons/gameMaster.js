@@ -80,7 +80,7 @@ class GameMaster {
     canMoveUnit(player, fromx, fromy, tox, toy) {
         var state = this.playerStates[player];
         var unit = this.level.unitMap[fromx][fromy];
-        return state.moves > 0
+        return (state.moves > 0 || state.unitMoves > 0)
             && (fromx != tox || fromy != toy)
             && this.currentPlayer == player
             && this.level.tileMap[fromx][fromy] == player

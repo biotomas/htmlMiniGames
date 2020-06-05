@@ -6,7 +6,7 @@ class MultiplayerServer {
             // my linux laptop
             this.maxFps = 10;
             this.serverUrl = "http://localhost/aoh/server.php";
-        } else if (serverName == "TODO") {
+        } else if (serverName == "CAS-N03923") {
             // my windows laptop
             this.maxFps = 60;
             this.serverUrl = "http://localhost/htmlMiniGames/age-of-hexagons/server.php";

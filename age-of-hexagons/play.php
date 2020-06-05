@@ -158,7 +158,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             }
 
             if (state != States.ANIMATION
-                && gameMaster.playerStates[gameMaster.currentPlayer].moves == 0) {
+                && gameMaster.playerStates[gameMaster.currentPlayer].moves + gameMaster.playerStates[gameMaster.currentPlayer].unitMoves == 0 ) {
                 gameMaster.endTurn(gameMaster.currentPlayer);
             }
 
