@@ -18,6 +18,7 @@ function checkEndTurnPressed() {
 }
 
 function drawHud(cc) {
+    resetScale(1);
     hudWidth = hudPerPlayer + hudPerPlayer * gameMaster.players;
 
     cc.beginPath();
@@ -89,7 +90,5 @@ function drawHud(cc) {
         cc.fillText(state.unitMoves + "+" + state.moves, hudx + 5 + playerIndex * hudPerPlayer, hudy + 60);
 
     }
-
-
-
+    resetScale(globalscale);
 }

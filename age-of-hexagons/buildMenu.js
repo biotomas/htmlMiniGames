@@ -80,13 +80,13 @@ function drawTooltip(cc) {
         cc.fillStyle = "red";
     }
     cc.fillText(Math.abs(profit) , menux + 202 + incomeSize, menuy - 10);
-
 }
 
 function drawBuildMenu(cc) {
     if (!buildMenuEnabled) {
         return;
     }
+    resetScale(1);
     menux = (c.width - menuWidth) / 2;
     menuy = c.height - menuHeigth - 10;
     if (menuActive) {
@@ -125,4 +125,5 @@ function drawBuildMenu(cc) {
     cc.fillText("Build ", menux + 110, menuy + 20);
     cc.fillText("Train ", menux + 390, menuy + 20);
     cc.font = "16px Arial";
+    resetScale(globalscale);
 }

@@ -18,6 +18,7 @@ var playerColors = [
 // global graphics offsets (used for scrolling the map)
 globalxoff = 0;
 globalyoff = 0;
+globalscale = 1;
 
 // assets
 bgimg = loadImage('assets/water.png');
@@ -56,8 +57,8 @@ function loadImage(src) {
 
 function drawBackground(cc, time) {
     xoffset = (time / 100) % 100;
-    for (x = 0; x < c.width + bgimg.width; x += bgimg.width) {
-        for (y = 0; y < c.height + bgimg.height; y += bgimg.height) {
+    for (x = 0; x*globalscale < c.width + bgimg.width; x += bgimg.width) {
+        for (y = 0; y*globalscale < c.height + bgimg.height; y += bgimg.height) {
             cc.drawImage(bgimg, x - xoffset, y - xoffset);
         }
     }
@@ -79,7 +80,12 @@ function scrollCanvas() {
     if (keypressed(82)) {
         globalxoff = 0;
         globalyoff = 0;
+        globalscale = 1;
     }
+}
+
+function resetScale(scale) {
+    cc.setTransform(scale, 0, 0, scale, 0, 0);
 }
 
 function coordsToPixels(x, y) {
@@ -91,6 +97,8 @@ function coordsToPixels(x, y) {
 }
 
 function pixelsToCoords(x, y) {
+    x = x / globalscale;
+    y = y / globalscale;
     mx = Math.floor((x - globalxoff + graphicConstants.tileWidth / 2) / (graphicConstants.tileWidth * 0.75));
     dy = 0;
     if (mx % 2 == 1) {

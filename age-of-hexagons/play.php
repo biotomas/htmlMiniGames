@@ -77,7 +77,6 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             }
         }
 
-
         currentLevel = Object.assign(new Level(1, 1), maps[mapId]);
         selectedUnit = null;
         reachableTiles = new Set();
@@ -115,7 +114,10 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
         }
 
 
+
         function update() {
+            resetScale(globalscale);
+
             d = new Date();
             tnow = d.getTime();
             scrollCanvas();
