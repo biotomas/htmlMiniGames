@@ -44,7 +44,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
         echo "multiPlayerGame = false; mapId = 1; step = 1; players = 2;";
     } else {
         echo "multiPlayerGame = true; step = 1; ";
-        echo "server = new MultiplayerServer('" . gethostname() . "');";
+        echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "');";
         echo "gameId = " . $_POST['gid'] .";";
         echo "mapId = " . $_POST['level'] .";";
         echo "players = " . $_POST['players'] .";";

@@ -1,3 +1,4 @@
+
 CREATE TABLE `gameMoves` (
   `gameId` int(11) NOT NULL,
   `move` varchar(50) NOT NULL,
@@ -18,3 +19,6 @@ CREATE TABLE `lobby` (
   `name7` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`gameId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=big5;
+
+CREATE USER 'aoh'@'localhost' IDENTIFIED BY 'aoh';
+GRANT ALL ON aoh.* TO 'aoh'@'localhost';
