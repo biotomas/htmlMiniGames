@@ -9,16 +9,23 @@
     // putenv("AOH_DB_USER=aoh");
     // putenv("AOH_DB_PASS=aoh");
 
+    if (!getenv('AOH_BASE_URL')) {
+        // this file only exist at freelunch.eu
+        // the hosting there does not allow environment variables
+        require '../config.php';
+    }
+
     function readEnv($key) {
         $result = getenv($key);
-        if (!$result) throw new Exception("env $key must be defined");
+        global $config;
+        if (!$result) return $config[$key];
         return $result;
     }
 
     function ENV_BASE_URL() {
         return readEnv('AOH_BASE_URL');
     }
-  
+
     function ENV_FPS() {
         return readEnv('AOH_FPS');
     }
