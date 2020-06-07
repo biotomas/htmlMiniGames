@@ -63,8 +63,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
         window.onload = function () {
             c = document.getElementById('scene');
             initializeInput(c);
-            c.width = window.innerWidth - 100;
-            c.height = window.innerHeight - 100;
+            updateCanvasSize();
             cc = c.getContext('2d');
             var fpsLimit = 10;
             if (typeof server !== 'undefined') {
@@ -75,6 +74,12 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
                 server.refreshMoves(gameId, step);
                 netUpdate();
             }
+        }
+
+        function updateCanvasSize() {
+            c = document.getElementById('scene');
+            c.width = window.innerWidth - 100;
+            c.height = window.innerHeight - 100;
         }
 
         currentLevel = Object.assign(new Level(1, 1), maps[mapId]);

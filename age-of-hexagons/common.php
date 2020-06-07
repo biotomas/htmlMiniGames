@@ -1,5 +1,5 @@
 <?php
-    $version = 0.3;
+    $version = 0.4;
 
     // you can use this to quickly test multiple environment vars
     // putenv("AOH_BASE_URL=http://localhost:80/aoh");
