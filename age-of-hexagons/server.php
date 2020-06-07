@@ -1,21 +1,10 @@
-<?php
+<?php 
+	require 'common.php';
 
-$hostname = gethostname();
-
-if ($hostname == "tomas-HP-ProBook-4330s" || $hostname == "CAS-N03923") {
-	$servername = "localhost";
-	$username = "hexas";
-	$password = "hexas";
-	$dbname = "hexas";
-} else {
-	$servername = "md51.wedos.net";
-	$username = "w225003_hexas";
-	$password = "jirae44@fe233221FDDW";
-	$dbname = "d225003_hexas";
-}
-	
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$db = ENV_DB();
+error_log("connecting db: " . print_r($db, 1) );
+$conn = new mysqli($db['server'], $db['user'], $db['password'], $db['schema']);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -52,7 +41,7 @@ if ($op == 'move') {
 			break;
 		}
 		$tries++;
-	}
+	} 
 } else if ($op == 'getLobby') {
 	$gid = $_POST['gid'];
 	$sql = "SELECT * from lobby where gameId = '{$gid}'";

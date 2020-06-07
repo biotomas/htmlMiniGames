@@ -26,7 +26,7 @@
 <body>
     <h1>Battle for Hexagon Isle</h1>
     <?php
-    $gid = $_GET["gid"];
+    $gid = (isset($_GET["gid"])) ? $_GET["gid"] : '';
     if (!$gid) {
         echo '<input type="button" value="Host a Game" onclick="hostGame()">';
     } else {
@@ -56,7 +56,7 @@
 <input style="display:none" type="submit" value="Start The Game!" id="submit" onclick="startTheGameHost()"/>
 
     <script>
-        <?php echo "server = new MultiplayerServer('" . gethostname() . "');"; ?>
+        <?php echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "');"; ?>
 
         window.onload = function () {
             for (var index = 1; index <= 8; index++) {

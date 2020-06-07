@@ -1,20 +1,10 @@
 
 class MultiplayerServer {
 
-    constructor(serverName) {
-        if (serverName == "tomas-HP-ProBook-4330s") {
-            // my linux laptop
-            this.maxFps = 10;
-            this.serverUrl = "http://localhost/aoh/server.php";
-        } else if (serverName == "CAS-N03923") {
-            // my windows laptop
-            this.maxFps = 60;
-            this.serverUrl = "http://localhost/htmlMiniGames/age-of-hexagons/server.php";
-        } else {
-            // freelunch.eu
-            this.maxFps = 60;
-            this.serverUrl = "http://freelunch.eu/age-of-hexagons/server.php";
-        }
+    constructor(serverUrl, maxFps = 60) {
+        this.maxFps = maxFps;
+        this.serverUrl = serverUrl + "/server.php";
+        console.log("init server connection: " + this)
     }
 
     syncSend(message) {
