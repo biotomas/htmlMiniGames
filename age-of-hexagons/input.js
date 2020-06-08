@@ -4,6 +4,8 @@ keyState = {};
 keyDown = {};
 touchX = null;
 touchY = null;
+touchX2 = null;
+touchY2 = null;
 
 function initializeInput(c) {
 	window.addEventListener('keydown', function (e) {
@@ -17,31 +19,45 @@ function initializeInput(c) {
 	}, true);
 
 	window.addEventListener('touchstart', function (e) {
-		var x = e.changedTouches[0].screenX;
-		var y = e.changedTouches[0].screenY;
-		touchX = x;
-		touchY = y;
+		touchX = e.changedTouches[0].screenX;
+		touchY = e.changedTouches[0].screenY;
+		if (e.changedTouches.length > 1) {
+			touchX2 = e.changedTouches[1].screenX;
+			touchY2 = e.changedTouches[1].screenY;
+		}
 	}, true);
 
-	window.addEventListener('gesturechange', function(e) {
-		if (e.scale < 1.0) {
-			// User moved fingers closer together
-			globalscale = globalscale / 1.05;
-		} else if (e.scale > 1.0) {
-			// User moved fingers further apart
-			globalscale = globalscale * 1.05;
-		}
+	window.addEventListener("orientationchange", function () {
+		setTimeout(updateCanvasSize, 1000);
 	}, false);
-
-	window.addEventListener("orientationchange", function() {
-		setTimeout(updateCanvasSize, 50);
-	  }, false);
 
 	window.addEventListener('touchmove', function (e) {
 		var x = e.changedTouches[0].screenX;
 		var y = e.changedTouches[0].screenY;
-		globalxoff -= touchX - x;
-		globalyoff -= touchY - y;
+		if (e.changedTouches.length > 1) {
+			var x2 = e.changedTouches[1].screenX;
+			var y2 = e.changedTouches[1].screenY;
+			//zooming
+			if (touchX2 != null) {
+				var dist = Math.abs(x - x2) + Math.abs(y - y2);
+				var prevDist = Math.abs(touchX - touchX2) + Math.abs(touchY - touchY2);
+				console.log(dist - prevDist);
+				//globalscale += (dist - prevDist) * 0.01;
+				if (dist - prevDist < 0) {
+					globalscale = globalscale - 0.05;
+				} else {
+					globalscale = globalscale + 0.05;
+				}
+			}
+			touchY2 = y2;
+			touchX2 = x2;
+		} else {
+			// scrolling
+			globalxoff -= touchX - x;
+			globalyoff -= touchY - y;
+			touchY2 = null;
+			touchX2 = null;
+		}
 		touchY = y;
 		touchX = x;
 	}, true);

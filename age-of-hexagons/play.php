@@ -29,7 +29,7 @@
     <script src="server.js?ver=<?=$version?>"></script>
 </head>
 
-<body>
+<body style="overscroll-behavior-y: contain; touch-action:none;">
     <div style="text-align:center; width:100%; height:100%">
         <canvas id="scene"></canvas>
         <p>Framerate: <span id="fps"></span></p>
@@ -65,7 +65,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             initializeInput(c);
             updateCanvasSize();
             cc = c.getContext('2d');
-            var fpsLimit = 10;
+            var fpsLimit = 60;
             if (typeof server !== 'undefined') {
                 fpsLimit = server.maxFps;
             }
