@@ -57,8 +57,8 @@ function loadImage(src) {
 
 function drawBackground(cc, time) {
     xoffset = (time / 100) % 100;
-    for (x = 0; x*globalscale < c.width + bgimg.width; x += bgimg.width) {
-        for (y = 0; y*globalscale < c.height + bgimg.height; y += bgimg.height) {
+    for (x = 0; x * globalscale < c.width + bgimg.width; x += bgimg.width) {
+        for (y = 0; y * globalscale < c.height + bgimg.height; y += bgimg.height) {
             cc.drawImage(bgimg, x - xoffset, y - xoffset);
         }
     }
@@ -66,21 +66,20 @@ function drawBackground(cc, time) {
 
 function scrollCanvas() {
     if (keyIsDown(65)) {
-        globalxoff += 5;
+        globalxoff += 5 * globalscale;
     }
     if (keyIsDown(68)) {
-        globalxoff -= 5;
+        globalxoff -= 5 * globalscale;
     }
     if (keyIsDown(87)) {
-        globalyoff += 5;
+        globalyoff += 5 * globalscale;
     }
     if (keyIsDown(83)) {
-        globalyoff -= 5;
+        globalyoff -= 5 * globalscale;
     }
     if (keypressed(82)) {
-        globalxoff = 0;
-        globalyoff = 0;
         globalscale = 1;
+        currentLevel.refresh();
     }
 }
 

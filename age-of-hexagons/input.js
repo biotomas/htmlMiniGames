@@ -65,10 +65,16 @@ function initializeInput(c) {
 	window.addEventListener('wheel', function (e) {
 		if (e.deltaY > 0) {
 			globalscale = globalscale / 1.1;
+			// globalxoff *= 1.1;
+			// globalyoff *= 1.1;
 		} else {
 			globalscale = globalscale * 1.1;
+			// globalxoff /= 1.1;
+			// globalyoff /= 1.1;
 		}
-		console.log(e);
+		globalxoff += globalxoff * globalscale;
+		globalyoff += globalyoff * globalscale;
+		//currentLevel.refresh();
 	}, true);
 
 	window.addEventListener('mousemove', function (e) {

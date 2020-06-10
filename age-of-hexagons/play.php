@@ -64,6 +64,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             c = document.getElementById('scene');
             initializeInput(c);
             updateCanvasSize();
+            currentLevel.refresh();
             cc = c.getContext('2d');
             var fpsLimit = 60;
             if (typeof server !== 'undefined') {
@@ -122,7 +123,6 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
 
         function update() {
             resetScale(globalscale);
-
             d = new Date();
             tnow = d.getTime();
             scrollCanvas();

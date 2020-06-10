@@ -22,6 +22,17 @@ class Level {
         }
     };
 
+    refresh() {
+        console.log(c.width, c.height, globalscale, this.level_width * graphicConstants.tileWidth * 0.75 * globalscale);
+
+        var mapWidth = (parseInt(this.level_width) - 1) * graphicConstants.tileWidth * 0.75 * globalscale;
+        var mapHeight = this.level_heigth * graphicConstants.tileHeight * globalscale;
+
+        globalxoff = ((c.width - mapWidth) / 2) / globalscale;
+        globalyoff = ((c.height - mapHeight) / 2) / globalscale;
+
+    }
+
     outOfBounds(x, y) {
         return x < 0 || y < 0 || x >= this.level_width || y >= this.level_heigth;
     }
