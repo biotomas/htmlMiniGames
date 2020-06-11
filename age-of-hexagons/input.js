@@ -63,18 +63,24 @@ function initializeInput(c) {
 	}, true);
 
 	window.addEventListener('wheel', function (e) {
+		var oldCenterx = c.width / 2 / globalscale - globalxoff;
+		var oldCentery = c.height / 2 / globalscale - globalyoff;
+		var oldScale = globalscale;
 		if (e.deltaY > 0) {
 			globalscale = globalscale / 1.1;
-			// globalxoff *= 1.1;
-			// globalyoff *= 1.1;
 		} else {
 			globalscale = globalscale * 1.1;
-			// globalxoff /= 1.1;
-			// globalyoff /= 1.1;
 		}
-		//globalxoff *= globalscale * globalscale;
-		//globalyoff *= globalscale * globalscale;
-		currentLevel.refresh();
+		if (globalscale < 0.5) {
+			globalscale = 0.5;
+		}
+		var diff = globalscale / oldScale;
+		globalxoff /= diff;
+		globalyoff /= diff;
+		var newCenterx = c.width / 2 / globalscale - globalxoff;
+		var newCentery = c.height / 2 / globalscale - globalyoff;
+		globalxoff += newCenterx - oldCenterx;
+		globalyoff += newCentery - oldCentery;
 	}, true);
 
 	window.addEventListener('mousemove', function (e) {
