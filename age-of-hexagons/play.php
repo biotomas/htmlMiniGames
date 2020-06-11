@@ -35,6 +35,10 @@
         <p>Framerate: <span id="fps"></span></p>
         <p>Cursor: <span id="cursor"></span></p>
     </div>
+    <audio controls loop id="music" style="display:none;">
+        <source src="assets/music/clippity_clop.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
     <script>
 
 playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
@@ -61,12 +65,13 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
 ?>
 
         window.onload = function () {
+            music = document.getElementById('music');
             c = document.getElementById('scene');
             initializeInput(c);
             updateCanvasSize();
             currentLevel.refresh();
             cc = c.getContext('2d');
-            var fpsLimit = 60;
+            var fpsLimit = 10;
             if (typeof server !== 'undefined') {
                 fpsLimit = server.maxFps;
             }
@@ -260,6 +265,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             }
         }
     </script>
+    <p>Music by Eric Matyas, <a href='www.soundimage.org'>www.soundimage.org</a></p>
 </body>
 
 </html>

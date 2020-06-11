@@ -162,11 +162,9 @@ class GameMaster {
         }
         this.level.unitMap[fromx][fromy] = null;
         this.movedUnits.delete(fromx + ":" + fromy);
-        console.log(this.movedUnits);
     }
 
     takeTerritory(x, y, oldOwner, newOwner, kill) {
-        console.log("take territory", x, y, oldOwner, newOwner);
         var state = this.playerStates[newOwner];
         var enemyState = this.playerStates[oldOwner];
         var enemyUnit = this.level.unitMap[x][y];
@@ -244,6 +242,7 @@ class GameMaster {
                 continue;
             }
             if (this.isSurrounded(player, n.x, n.y)) {
+                //TODO check the defense number of the location
                 this.takeTerritory(n.x, n.y, owner, player, false);
             }
         }

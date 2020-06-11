@@ -34,6 +34,10 @@
     }
 
     ?>
+    <audio controls loop id="music" style="display:none;">
+        <source src="assets/music/tower_defense.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
 
 <form id='myform' method="post" action="play.php">
 </form>
@@ -59,6 +63,7 @@
         <?php echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "');"; ?>
 
         window.onload = function () {
+            music = document.getElementById('music');
             for (var index = 1; index <= 8; index++) {
                 document.getElementById('r'+index).style.backgroundColor=playerColors[index];
             }
@@ -78,6 +83,11 @@
         }
 
         function updateLobby() {
+            try {
+                music.play();
+            } catch (error) {
+                //ignore
+            }
             if (myPlayerId != 1) {
                 document.getElementById('level').disabled=true;
                 document.getElementById('submit').disabled=true;
@@ -164,5 +174,7 @@
             }
         }
     </script>
+    <p>Music by Eric Matyas, <a href='www.soundimage.org'>www.soundimage.org</a></p>
+
 </body>
 </html>

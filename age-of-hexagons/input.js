@@ -88,8 +88,9 @@ function initializeInput(c) {
 		mousex = e.clientX - rect.left;
 		mousey = e.clientY - rect.top;
 	}, true);
-
+	
 	window.addEventListener('mousedown', function (e) {
+		music.play();
 		if (e.button == 0) {
 			keyState['leftMouse'] = true;
 			keyDown['leftMouse'] = true;
