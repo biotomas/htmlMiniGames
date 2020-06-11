@@ -22,14 +22,14 @@ globalscale = 1;
 
 // assets
 bgimg = loadImage('assets/water.png');
-farmImg = loadImage('assets/farm.png');
-towerImg = loadImage('assets/tower.png');
-townImg = loadImage('assets/town.png');
+farmImg = loadImage('assets/farm.svg');
+towerImg = loadImage('assets/tower.svg');
+townImg = loadImage('assets/town.svg');
 treeImg = loadImage('assets/tree.png');
-peasantImg = loadImage('assets/peasant.png');
-spearmanImg = loadImage('assets/spearman.png');
-swordsmanImg = loadImage('assets/swordsman.png');
-knightImg = loadImage('assets/knight.png');
+peasantImg = loadImage('assets/peasant.svg');
+spearmanImg = loadImage('assets/spearman.svg');
+swordsmanImg = loadImage('assets/swordsman.svg');
+knightImg = loadImage('assets/knight.svg');
 disabledImg = loadImage('assets/disabled.png');
 
 
@@ -40,10 +40,10 @@ animationImgs[Units.Swordsman] = {};
 animationImgs[Units.Knight] = {};
 
 for (var i = 1; i <= 6; i++) {
-    animationImgs[Units.Peasant][i] = loadImage('assets/peasant' + (i > 1 ? i : '') + '.png');
-    animationImgs[Units.Spearman][i] = loadImage('assets/spearman' + (i > 1 ? i : '') + '.png');
-    animationImgs[Units.Swordsman][i] = loadImage('assets/swordsman' + (i > 1 ? i : '') + '.png');
-    animationImgs[Units.Knight][i] = loadImage('assets/knight' + (i > 1 ? i : '') + '.png');
+    animationImgs[Units.Peasant][i] = loadImage('assets/peasant' + (i > 1 ? i : '') + '.svg');
+    animationImgs[Units.Spearman][i] = loadImage('assets/spearman' + (i > 1 ? i : '') + '.svg');
+    animationImgs[Units.Swordsman][i] = loadImage('assets/swordsman' + (i > 1 ? i : '') + '.svg');
+    animationImgs[Units.Knight][i] = loadImage('assets/knight' + (i > 1 ? i : '') + '.svg');
 }
 
 // See gameLogic.units for ordering
@@ -66,16 +66,16 @@ function drawBackground(cc, time) {
 
 function scrollCanvas() {
     if (keyIsDown(65)) {
-        globalxoff += 5 * globalscale;
+        globalxoff += 5 / globalscale;
     }
     if (keyIsDown(68)) {
-        globalxoff -= 5 * globalscale;
+        globalxoff -= 5 / globalscale;
     }
     if (keyIsDown(87)) {
-        globalyoff += 5 * globalscale;
+        globalyoff += 5 / globalscale;
     }
     if (keyIsDown(83)) {
-        globalyoff -= 5 * globalscale;
+        globalyoff -= 5 / globalscale;
     }
     if (keypressed(82)) {
         globalscale = 1;

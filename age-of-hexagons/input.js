@@ -72,9 +72,9 @@ function initializeInput(c) {
 			// globalxoff /= 1.1;
 			// globalyoff /= 1.1;
 		}
-		globalxoff += globalxoff * globalscale;
-		globalyoff += globalyoff * globalscale;
-		//currentLevel.refresh();
+		//globalxoff *= globalscale * globalscale;
+		//globalyoff *= globalscale * globalscale;
+		currentLevel.refresh();
 	}, true);
 
 	window.addEventListener('mousemove', function (e) {
