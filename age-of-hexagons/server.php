@@ -23,7 +23,7 @@ if ($op == 'move') {
 		$sql = "INSERT INTO gameMoves (`gameId`, `step`, `move`) VALUES ('{$gid}', '{$step}', '{$move}')";
 		//echo $sql;
 		$result = $conn->query($sql);
-		echo $result;
+		if ($result) echo "OK";
 	} else {
 		echo "invalid step";
 	}
@@ -64,9 +64,8 @@ if ($op == 'move') {
 	$col = $_POST['col'];
 	$val = $_POST['val'];
 	$sql = "update lobby set {$col}={$val} where gameId = {$gid}";
-	echo $sql;
 	$result = $conn->query($sql);
-	echo $result;
+	if ($result) echo "OK";
 } else if ($op == 'getLobby') {
 	$gid = $_POST['gid'];
 	$sql = "select * from lobby where gameId = '{$gid}'";
@@ -87,4 +86,3 @@ if ($op == 'move') {
 }
 $conn->close();
 ?>
-

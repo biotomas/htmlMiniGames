@@ -4,9 +4,11 @@ var AnimationType = {
     FadeIn: 2,
 }
 
+var animationLength = 1000;
+
 class Animation {
 
-    constructor(type, from, to, unit, goalUnit, length) {
+    constructor(type, from, to, unit, goalUnit) {
         this.type = type;
         this.from = from;
         this.to = to;
@@ -14,7 +16,7 @@ class Animation {
         this.goalUnit = goalUnit;
         d = new Date();
         this.start = d.getTime();
-        this.length = length;
+        this.length = animationLength;
     }
 
     play(cc, now) {

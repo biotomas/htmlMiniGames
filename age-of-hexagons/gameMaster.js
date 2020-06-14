@@ -135,7 +135,7 @@ class GameMaster {
             state.tiles++;
             this.level.unitMap[tox][toy] = null;
             animation.addAnimation(new Animation(AnimationType.FadeOut,
-                to, to, Units.Tree, thisUnit, 1000));
+                to, to, Units.Tree, thisUnit));
 
         }
         if (goalPlayer != player) {
@@ -148,12 +148,12 @@ class GameMaster {
             state.unitCount[thisUnit]--;
             state.unitCount[mergedUnit]++;
             animation.addAnimation(new Animation(AnimationType.Move,
-                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, mergedUnit, 1000));
+                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, mergedUnit));
         } else {
             // moving unit
             this.movedUnits.add(tox + ":" + toy);
             animation.addAnimation(new Animation(AnimationType.Move,
-                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, thisUnit, 1000));
+                { "x": fromx, "y": fromy }, { "x": tox, "y": toy }, thisUnit, thisUnit));
         }
         if (this.canMoveForFree(fromx, fromy)) {
             state.unitMoves--;
@@ -227,7 +227,7 @@ class GameMaster {
             this.playerStates[owner].unitMoves--;
         }
         animation.addAnimation(new Animation(AnimationType.FadeOut,
-            { "x": x, "y": y }, { "x": x, "y": y }, unit, null, 1000));
+            { "x": x, "y": y }, { "x": x, "y": y }, unit, null));
 
     }
 
@@ -366,7 +366,7 @@ class GameMaster {
         var tiles = this.level.tileMap;
         var to = { "x": x, "y": y };
         animation.addAnimation(new Animation(AnimationType.FadeIn,
-            to, to, Units.Tree, Units.Tree, 1000));
+            to, to, Units.Tree, Units.Tree));
 
         if (tiles[x][y] > 0) {
             this.playerStates[tiles[x][y]].tiles--;

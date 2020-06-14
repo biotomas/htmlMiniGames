@@ -48,7 +48,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
         echo "multiPlayerGame = false; mapId = 1; step = 1; players = 2;";
     } else {
         echo "multiPlayerGame = true; step = 1; ";
-        echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "');";
+        echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "', " . ENV_FPS() . ");";
         echo "gameId = " . $_POST['gid'] .";";
         echo "mapId = " . $_POST['level'] .";";
         echo "players = " . $_POST['players'] .";";
@@ -94,32 +94,20 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
         state = States.IDLE;
         gameMaster = new GameMaster(currentLevel, players);
         animation = new AnimationProvider();
+        moves = [];
 
         function netUpdate() {
             if (state != States.ANIMATION && multiPlayerGame) {
-                if (gameMaster.currentPlayer != localPlayer) {
-                    if (server.movesData == null) {
-                        setTimeout(netUpdate, 100);
-                        return;
-                    }
-                    var moves = server.movesData;
-                    for (let move of moves) {
-                        if (move.op == "go") {
-                            gameMaster.moveUnit(gameMaster.currentPlayer,
-                            move.fx, move.fy, move.tx, move.ty, animation);
-                        }
-                        if (move.op == "build") {
-                            gameMaster.buildUnit(gameMaster.currentPlayer,
-                            move.tx, move.ty, move.what);
-                        }
-                        if (move.op == "endTurn") {
-                            gameMaster.endTurn(gameMaster.currentPlayer);
-                        }
-                        step++;
-                        break;
-                    }
-                    server.refreshMoves(gameId, step);
+                if (moves.length > 0) {
+                    setTimeout(netUpdate, 50);
+                    return;
                 }
+                if (server.movesData == null) {
+                    setTimeout(netUpdate, 50);
+                    return;
+                }
+                moves = server.movesData;
+                server.refreshMoves(gameId, step);
             }
             setTimeout(netUpdate, 300);
         }
@@ -161,18 +149,42 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             drawBuildMenu(cc);
             drawHud(cc);
             framerate();
-            if (checkEndTurnPressed()) {
-                gameMaster.endTurn(gameMaster.currentPlayer);
-                if (multiPlayerGame) {
-                    server.sendEndTurn(gameId, step);
-                    step++;
-                }
-            }
-
+            
             if (state != States.ANIMATION
                 && gameMaster.playerStates[gameMaster.currentPlayer].moves + gameMaster.playerStates[gameMaster.currentPlayer].unitMoves == 0 ) {
                 gameMaster.endTurn(gameMaster.currentPlayer);
             }
+
+            if (state != States.ANIMATION && moves.length > 0) {
+                var move = moves.shift();
+                step++;
+                if (moves.length == 0) {
+                    server.refreshMoves(gameId, step);
+                }
+                animationLength = 200;
+                if (move.op == "go") {
+                    gameMaster.moveUnit(gameMaster.currentPlayer,
+                    move.fx, move.fy, move.tx, move.ty, animation);
+                }    
+                if (move.op == "build") {
+                    gameMaster.buildUnit(gameMaster.currentPlayer,
+                    move.tx, move.ty, move.what);
+                }    
+                if (move.op == "endTurn") {
+                    gameMaster.endTurn(gameMaster.currentPlayer);
+                }    
+                return;
+            }    
+            animationLength = 1000;
+
+
+            if (state != States.ANIMATION && checkEndTurnPressed()) {
+                gameMaster.endTurn(gameMaster.currentPlayer);
+                if (multiPlayerGame) {
+                    server.sendEndTurn(gameId, step);
+                    step++;
+                }    
+            }    
 
             if (state != States.ANIMATION && multiPlayerGame) {
                 if (gameMaster.currentPlayer != localPlayer) {

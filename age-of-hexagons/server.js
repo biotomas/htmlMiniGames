@@ -25,8 +25,20 @@ class MultiplayerServer {
         var ajaxRequest = new XMLHttpRequest();
         ajaxRequest.open("POST", this.serverUrl, asynchronnous);
         ajaxRequest.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200 && callback != null) {
-                callback(this.responseText);
+            if (this.readyState == 4) {
+                if (this.status == 200 && callback != null) {
+                    callback(this.responseText);
+                } else {
+                    if (this.status != 200) {
+                        console.error("server request failed with status: ", this.status,
+                        " message was ", message);
+                        return;
+                    }
+                    if (asynchronnous && this.responseText.trim() != "OK") {
+                        console.error("server request failed, response: '", 
+                        this.responseText, "' message was: ", message);
+                    }
+                }
             }
         };
         ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

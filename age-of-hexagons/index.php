@@ -83,11 +83,6 @@
         }
 
         function updateLobby() {
-            try {
-                music.play();
-            } catch (error) {
-                //ignore
-            }
             if (myPlayerId != 1) {
                 document.getElementById('level').disabled=true;
                 document.getElementById('submit').disabled=true;
@@ -163,6 +158,7 @@
         }
 
         function changePlayerName(playerId) {
+            music.play();
             var text = document.getElementById("pl"+playerId).value;
             if (text.length >= 8) {
                 document.getElementById("m"+playerId).innerHTML = " Name too long, max 8 characters allowed. ";
