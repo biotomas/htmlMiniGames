@@ -20,31 +20,30 @@ globalxoff = 0;
 globalyoff = 0;
 globalscale = 1;
 
-// assets
-bgimg = loadImage('assets/water.png');
-farmImg = loadImage('assets/farm.svg');
-towerImg = loadImage('assets/tower.svg');
-townImg = loadImage('assets/town.svg');
-treeImg = loadImage('assets/tree.png');
-peasantImg = loadImage('assets/peasant.svg');
-spearmanImg = loadImage('assets/spearman.svg');
-swordsmanImg = loadImage('assets/swordsman.svg');
-knightImg = loadImage('assets/knight.svg');
-disabledImg = loadImage('assets/disabled.png');
+// assets - environment
+bgimg = loadImage('assets/sprites/water.png');
+treeImg = loadImage('assets/sprites/tree.png');
+disabledImg = loadImage('assets/sprites/disabled.png');
 
+// assets - units
+farmImg = loadImage('assets/sprites/medieval/farm.svg');
+towerImg = loadImage('assets/sprites/medieval/tower.svg');
+townImg = loadImage('assets/sprites/medieval/town.svg');
+peasantImg = loadImage('assets/sprites/medieval/peasant.svg');
+spearmanImg = loadImage('assets/sprites/medieval/spearman.svg');
+swordsmanImg = loadImage('assets/sprites/medieval/swordsman.svg');
+knightImg = loadImage('assets/sprites/medieval/knight.svg');
 
-animationImgs = {};
-animationImgs[Units.Peasant] = {};
-animationImgs[Units.Spearman] = {};
-animationImgs[Units.Swordsman] = {};
-animationImgs[Units.Knight] = {};
-
-for (var i = 1; i <= 6; i++) {
-    animationImgs[Units.Peasant][i] = loadImage('assets/peasant' + (i > 1 ? i : '') + '.svg');
-    animationImgs[Units.Spearman][i] = loadImage('assets/spearman' + (i > 1 ? i : '') + '.svg');
-    animationImgs[Units.Swordsman][i] = loadImage('assets/swordsman' + (i > 1 ? i : '') + '.svg');
-    animationImgs[Units.Knight][i] = loadImage('assets/knight' + (i > 1 ? i : '') + '.svg');
-}
+bodyImg = {};
+feetImg = {};
+bodyImg[Units.Peasant] = loadImage('assets/sprites/medieval/peasant_body.svg');
+feetImg[Units.Peasant] = loadImage('assets/sprites/medieval/peasant_feet.svg');
+bodyImg[Units.Spearman] = loadImage('assets/sprites/medieval/spearman_body.svg');
+feetImg[Units.Spearman] = loadImage('assets/sprites/medieval/spearman_feet.svg');
+bodyImg[Units.Swordsman] = loadImage('assets/sprites/medieval/swordsman_body.svg');
+feetImg[Units.Swordsman] = loadImage('assets/sprites/medieval/swordsman_feet.svg');
+bodyImg[Units.Knight] = loadImage('assets/sprites/medieval/knight_body.svg');
+feetImg[Units.Knight] = loadImage('assets/sprites/medieval/knight_feet.svg');
 
 // See gameLogic.units for ordering
 var unitImages = [treeImg, towerImg, townImg, farmImg, peasantImg, spearmanImg, swordsmanImg, knightImg];

@@ -71,7 +71,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             updateCanvasSize();
             currentLevel.refresh();
             cc = c.getContext('2d');
-            var fpsLimit = 10;
+            var fpsLimit = 20;
             if (typeof server !== 'undefined') {
                 fpsLimit = server.maxFps;
             }

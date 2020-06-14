@@ -80,11 +80,12 @@ class Level {
                 if (unit != null && unit != Units.Reserved) {
                     if (gameMaster.canMoveForFree(i, j) && canMove(unit)
                         && gameMaster.currentPlayer == nation) {
-                        var which = (Math.round(timeNow / 100)) % 10;
-                        if (which > 5) {
-                            which = 10 - which;
+                        drawImage(context, feetImg[unit], i, j);
+                        var which = (timeNow / 10) % 100;
+                        if (which > 50) {
+                            which = 100 - which;
                         }
-                        drawImage(context, animationImgs[unit][which + 1], i, j);
+                        drawImage(context, bodyImg[unit], i, j + which * 0.002);
                     } else {
                         drawImage(context, unitImages[unit], i, j);
                     }
