@@ -78,7 +78,7 @@ class Level {
                 var unit = this.unitMap[i][j];
                 var nation = this.tileMap[i][j]
                 if (unit != null && unit != Units.Reserved) {
-                    if (gameMaster.canMoveForFree(i, j) && canMove(unit)
+                    if (typeof gameMaster !== 'undefined' && gameMaster.canMoveForFree(i, j) && canMove(unit)
                         && gameMaster.currentPlayer == nation) {
                         drawImage(context, feetImg[unit], i, j);
                         var which = (timeNow / 10) % 100;
