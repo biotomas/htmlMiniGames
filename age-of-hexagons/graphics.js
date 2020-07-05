@@ -3,50 +3,55 @@ var graphicConstants = {
     tileHeight: 60
 };
 
-var playerColors = [
-    "#aaaaaa",
-    "#aaffc3",
-    "#42d4f4",
-    "#bfef45",
-    "#e6beff",
-    "#469990",
-    "#e6a9aB",
-    "#ffd8b1",
-    "#fffac8",
-]
-
 // global graphics offsets (used for scrolling the map)
 globalxoff = 0;
 globalyoff = 0;
 globalscale = 1;
 
-// assets - environment
-bgimg = loadImage('assets/sprites/water.png');
-treeImg = loadImage('assets/sprites/tree.png');
-disabledImg = loadImage('assets/sprites/disabled.png');
+var theme = {};
+loadTheme('assets/themes/medieval', 'default');
+// TODO: theme selection via UI
+// loadTheme('assets/themes/nightmare', 'dark');
 
-// assets - units
-farmImg = loadImage('assets/sprites/medieval/farm.svg');
-towerImg = loadImage('assets/sprites/medieval/tower.svg');
-townImg = loadImage('assets/sprites/medieval/town.svg');
-peasantImg = loadImage('assets/sprites/medieval/peasant.svg');
-spearmanImg = loadImage('assets/sprites/medieval/spearman.svg');
-swordsmanImg = loadImage('assets/sprites/medieval/swordsman.svg');
-knightImg = loadImage('assets/sprites/medieval/knight.svg');
+function loadTheme(prefix, colors) {
+    
+    theme.playerColors = colorThemes[colors];
+    
+    theme.water = loadImage(prefix + '/water.png');
+    theme.disabled = loadImage(prefix + '/disabled.png');
 
-bodyImg = {};
-feetImg = {};
-bodyImg[Units.Peasant] = loadImage('assets/sprites/medieval/peasant_body.svg');
-feetImg[Units.Peasant] = loadImage('assets/sprites/medieval/peasant_feet.svg');
-bodyImg[Units.Spearman] = loadImage('assets/sprites/medieval/spearman_body.svg');
-feetImg[Units.Spearman] = loadImage('assets/sprites/medieval/spearman_feet.svg');
-bodyImg[Units.Swordsman] = loadImage('assets/sprites/medieval/swordsman_body.svg');
-feetImg[Units.Swordsman] = loadImage('assets/sprites/medieval/swordsman_feet.svg');
-bodyImg[Units.Knight] = loadImage('assets/sprites/medieval/knight_body.svg');
-feetImg[Units.Knight] = loadImage('assets/sprites/medieval/knight_feet.svg');
+    theme.unitImg = [];
+    theme.unitBody = [];
+    theme.unitFeet = [];
 
-// See gameLogic.units for ordering
-var unitImages = [treeImg, towerImg, townImg, farmImg, peasantImg, spearmanImg, swordsmanImg, knightImg];
+    // not animated
+    theme.unitImg[Units.Tree] = loadImage(prefix + '/tree.svg');
+    theme.unitImg[Units.Farm] = loadImage(prefix + '/farm.svg');
+    theme.unitImg[Units.Tower] = loadImage(prefix + '/tower.svg');
+    theme.unitImg[Units.Town] = loadImage(prefix + '/town.svg');
+
+    // Peasant
+    theme.unitImg[Units.Peasant] = loadImage(prefix + '/peasant.svg');
+    theme.unitBody[Units.Peasant] = loadImage(prefix + '/peasant_body.svg');
+    theme.unitFeet[Units.Peasant] = loadImage(prefix + '/peasant_feet.svg');
+    
+    // Spearman
+    theme.unitImg[Units.Spearman] = loadImage(prefix + '/spearman.svg');
+    theme.unitBody[Units.Spearman] = loadImage(prefix + '/spearman_body.svg');
+    theme.unitFeet[Units.Spearman] = loadImage(prefix + '/spearman_feet.svg');
+    
+    // Swordsman
+    theme.unitImg[Units.Swordsman] = loadImage(prefix + '/swordsman.svg');
+    theme.unitBody[Units.Swordsman] = loadImage(prefix + '/swordsman_body.svg');
+    theme.unitFeet[Units.Swordsman] = loadImage(prefix + '/swordsman_feet.svg');
+    
+    // Knight
+    theme.unitImg[Units.Knight] = loadImage(prefix + '/knight.svg');
+    theme.unitBody[Units.Knight] = loadImage(prefix + '/knight_body.svg');
+    theme.unitFeet[Units.Knight] = loadImage(prefix + '/knight_feet.svg');
+
+}
+
 
 function loadImage(src) {
     img = new Image;
@@ -56,9 +61,9 @@ function loadImage(src) {
 
 function drawBackground(cc, time) {
     xoffset = (time / 100) % 100;
-    for (x = 0; x * globalscale < c.width + bgimg.width; x += bgimg.width) {
-        for (y = 0; y * globalscale < c.height + bgimg.height; y += bgimg.height) {
-            cc.drawImage(bgimg, x - xoffset, y - xoffset);
+    for (x = 0; x * globalscale < c.width + theme.water.width; x += theme.water.width) {
+        for (y = 0; y * globalscale < c.height + theme.water.height; y += theme.water.height) {
+            cc.drawImage(theme.water, x - xoffset, y - xoffset);
         }
     }
 }
@@ -119,7 +124,7 @@ function drawImagePixels(cc, img, x, y) {
 function drawTile(cc, x, y, color) {
     pos = coordsToPixels(x, y);
     hexagonPath(cc, pos);
-    cc.fillStyle = playerColors[color];
+    cc.fillStyle = theme.playerColors[color];
     cc.stroke();
     cc.fill();
 }

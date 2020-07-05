@@ -12,6 +12,7 @@
     <title>Battle for Hexagon Isle</title>
     <script src="server.js?ver=<?=$version?>"></script>
     <script src="gameLogic.js?ver=<?=$version?>"></script>
+    <script src="colors.js?ver=<?=$version?>"></script>
     <script src="graphics.js?ver=<?=$version?>"></script>
     <style>
     body {
@@ -63,9 +64,10 @@
         <?php echo "server = new MultiplayerServer('" . ENV_BASE_URL() . "');"; ?>
 
         window.onload = function () {
+            
             music = document.getElementById('music');
             for (var index = 1; index <= 8; index++) {
-                document.getElementById('r'+index).style.backgroundColor=playerColors[index];
+                document.getElementById('r'+index).style.backgroundColor=theme.playerColors[index];
             }
             var gidSpan = document.getElementById('gurl');
             if (gidSpan) {
