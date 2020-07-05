@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      #- /var/lib/mysql
+      #- db_data:/var/lib/mysql
+      #- ./database.sql:/tmp/init.sql
+      - ./database.sql:/docker-entrypoint-initdb.d/aoh.sql
+    ports:
+      - 3306:3306
+    #command: --init-file /tmp/init.sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: aoh
+      MYSQL_PASSWORD: aoh
+      MYSQL_DATABASE: aoh
+
+  web:
+    depends_on:
+      - db
+    build: ./apache
+    volumes:
+      - .:/var/www/html/aoh
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      AOH_BASE_URL: http://localhost:80/aoh
+      AOH_FPS: 60
+      AOH_DB_SERVER: db:3306
+      AOH_DB_SCHEMA: aoh
+      AOH_DB_USER: aoh
+      AOH_DB_PASS: aoh
+
+#volumes:
+#  db_data: {}
