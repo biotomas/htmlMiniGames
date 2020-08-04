@@ -16,6 +16,7 @@
     <script src="input.js"></script>
     <script src="level.js"></script>
     <script src="gameLogic.js"></script>
+    <script src="colors.js"></script>
     <script src="graphics.js"></script>
     <script src="maps.js"></script>
     <script src="buildMenu.js"></script>
@@ -169,7 +170,7 @@
 
             cc.globalAlpha = 0.5;
             if (unitToBuild != null) {
-                drawImage(cc, unitImages[unitToBuild], mx, my);
+                drawImage(cc, theme.unitImg[unitToBuild], mx, my);
                 if (keypressed('leftMouse')) {
                     currentLevel.unitMap[mx][my] = unitToBuild;
                 }

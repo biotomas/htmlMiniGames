@@ -30,17 +30,17 @@ class Animation {
             var t = coordsToPixels(this.to.x, this.to.y);
             var x = this.interpolate(f[0], t[0], progress);
             var y = this.interpolate(f[1], t[1], progress);
-            drawImagePixels(cc, unitImages[this.unit], x, y);
+            drawImagePixels(cc, theme.unitImg[this.unit], x, y);
         }
         if (this.type == AnimationType.FadeOut) {
             cc.globalAlpha = 1 - progress;
-            drawImage(cc, unitImages[this.unit], this.from.x,
+            drawImage(cc, theme.unitImg[this.unit], this.from.x,
                 this.from.y);
             cc.globalAlpha = 1;
         }
         if (this.type == AnimationType.FadeIn) {
             cc.globalAlpha = progress;
-            drawImage(cc, unitImages[this.unit], this.from.x,
+            drawImage(cc, theme.unitImg[this.unit], this.from.x,
                 this.from.y);
             cc.globalAlpha = 1;
         }

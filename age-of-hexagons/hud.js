@@ -39,8 +39,8 @@ function drawHud(cc) {
     for (var playerIndex = 1; playerIndex <= gameMaster.players; playerIndex++) {
         cc.beginPath();
         cc.lineWidth = "1";
-        cc.strokeStyle = playerColors[playerIndex];
-        cc.fillStyle = playerColors[playerIndex];
+        cc.strokeStyle = theme.playerColors[playerIndex];
+        cc.fillStyle = theme.playerColors[playerIndex];
         cc.rect(hudx + playerIndex * hudPerPlayer, hudy, hudPerPlayer, hudHeigth);
         cc.stroke();
         cc.fill();

@@ -109,7 +109,7 @@ function drawBuildMenu(cc) {
         } else {
             cc.globalAlpha = 0.2;
         }
-        cc.drawImage(unitImages[unit], menux + (unit - 1) * 80, menuy + 30 + (unit == buildUnit ? -8 : 0));
+        cc.drawImage(theme.unitImg[unit], menux + (unit - 1) * 80, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     for (var unit = 4; unit <= 7; unit++) {
         if (buildMenuEditorMode || gameMaster.canAfford(unit)) {
@@ -117,7 +117,7 @@ function drawBuildMenu(cc) {
         } else {
             cc.globalAlpha = 0.2;
         }
-        cc.drawImage(unitImages[unit], menux + 280 + (unit - 4) * 60, menuy + 30 + (unit == buildUnit ? -8 : 0));
+        cc.drawImage(theme.unitImg[unit], menux + 280 + (unit - 4) * 60, menuy + 30 + (unit == buildUnit ? -8 : 0));
     }
     cc.globalAlpha = 1;
     cc.fillStyle = "black";

@@ -1,3 +1,6 @@
+CREATE USER 'aoh'@'localhost' IDENTIFIED BY 'aoh';
+
+USE aoh;
 
 CREATE TABLE `gameMoves` (
   `gameId` int(11) NOT NULL,
@@ -20,5 +23,5 @@ CREATE TABLE `lobby` (
   PRIMARY KEY (`gameId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=big5;
 
-CREATE USER 'aoh'@'localhost' IDENTIFIED BY 'aoh';
-GRANT ALL ON aoh.* TO 'aoh'@'localhost';
+GRANT ALL ON aoh.* TO 'aoh'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;

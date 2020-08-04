@@ -20,6 +20,7 @@
     <script src="input.js?ver=<?=$version?>"></script>
     <script src="level.js?ver=<?=$version?>"></script>
     <script src="gameLogic.js?ver=<?=$version?>"></script>
+    <script src="colors.js?ver=<?=$version?>"></script>
     <script src="graphics.js?ver=<?=$version?>"></script>
     <script src="maps.js?ver=<?=$version?>"></script>
     <script src="buildMenu.js?ver=<?=$version?>"></script>
@@ -204,7 +205,7 @@ playerNames = ["nature", "Name1", "Name2", "Name3", "Name4"];
             while (!currentLevel.outOfBounds(mx, my)) {
                 if (state == States.BUILD) {
                     cc.globalAlpha = 0.3;
-                    drawImage(cc, unitImages[unitToBuild], mx, my);
+                    drawImage(cc, theme.unitImg[unitToBuild], mx, my);
                     cc.globalAlpha = 1;
                 }
                 if (keypressed('leftMouse')) {

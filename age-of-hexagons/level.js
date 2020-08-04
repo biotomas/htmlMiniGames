@@ -52,7 +52,7 @@ class Level {
         for (var i = -1; i <= this.level_width; i++) {
             for (var j = -1; j <= this.level_heigth; j++) {
                 if (i == -1 || j == -1 || i == this.level_width || j == this.level_heigth) {
-                    drawImage(context, disabledImg, i, j);
+                    drawImage(context, theme.disabled, i, j);
                 }
             }
         }
@@ -80,14 +80,14 @@ class Level {
                 if (unit != null && unit != Units.Reserved) {
                     if (typeof gameMaster !== 'undefined' && gameMaster.canMoveForFree(i, j) && canMove(unit)
                         && gameMaster.currentPlayer == nation) {
-                        drawImage(context, feetImg[unit], i, j);
+                        drawImage(context, theme.unitFeet[unit], i, j);
                         var which = (timeNow / 10) % 100;
                         if (which > 50) {
                             which = 100 - which;
                         }
-                        drawImage(context, bodyImg[unit], i, j + which * 0.002);
+                        drawImage(context, theme.unitBody[unit], i, j + which * 0.002);
                     } else {
-                        drawImage(context, unitImages[unit], i, j);
+                        drawImage(context, theme.unitImg[unit], i, j);
                     }
                 }
             }
